@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "832175534179",
+    "project_id": "chameleon-4d8c1",
+    "storage_bucket": "chameleon-4d8c1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:832175534179:android:6af4cd81f64512e6c34856",
+        "android_client_info": {
+          "package_name": "com.example.chameleon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3JpygZQmCGMNaekC0uFYPWE8xeeNjhLs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
