@@ -1,47 +1,27 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/display_grid.dart';
-import '../widgets/wide_button.dart';
+import 'waiting_people_page.dart';
+import 'waiting_topics_page.dart';
 
 class WaitingPage extends StatelessWidget {
   const WaitingPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Scaffold to provide appBar and structure
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Waiting Page',
-        ),
-        automaticallyImplyLeading: false, // This removes the back arrow
+        title: const Text('Join Code: ABCXYZ'),
+        automaticallyImplyLeading: false, // Removes the back arrow
       ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Text(
-              'Join Code: ABCXYZ',
-              style: TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-              DisplayGrid(
-                usernames: ['Player1', 'Player2', 'Player3', 'Player4'], // Example usernames
-              ),
-          ],
-        ),
+      // PageView for horizontal swiping
+      body: PageView(
+        scrollDirection: Axis.horizontal, // Specifies the swiping direction
+        children: const <Widget>[
+          WaitingPeoplePage(), // First instance of the WaitingPage
+          WaitingTopicsPage(), // Second instance, can customize differently if needed
+        ],
       ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(bottom: 40),
-        child: WideButton(
-              text: 'Cancel',
-              color: Colors.red,
-              onPressed: (){
-                Navigator.pop(context);
-              }, // Corrected: Pass function reference
-        ),
-      )
     );
   }
 }
