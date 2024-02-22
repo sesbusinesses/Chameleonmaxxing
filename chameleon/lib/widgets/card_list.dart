@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:chameleon/widgets/topic_card.dart'; // Ensure this path is correct
+import 'package:chameleon/pages/card_display.dart';
+import 'package:chameleon/models/topic_card.dart';
 
 const itemSize = 150.0;
 
@@ -11,12 +12,10 @@ class CardList extends StatefulWidget {
 }
 
 class _CardListState extends State<CardList> {
-
   final scrollController = ScrollController(); // Add a ScrollController
 
-  void onListen(){
-    setState(() {
-    });
+  void onListen() {
+    setState(() {});
   }
 
   @override
@@ -28,7 +27,8 @@ class _CardListState extends State<CardList> {
 
   @override
   void dispose() {
-    scrollController.removeListener(onListen); // Remove listener when the widget is disposed
+    scrollController.removeListener(
+        onListen); // Remove listener when the widget is disposed
     super.dispose();
   }
 
@@ -48,17 +48,17 @@ class _CardListState extends State<CardList> {
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  // Ensure the index is within the range of topicCards
                   if (index < topicCards.length) {
                     final topicCard = topicCards[index];
-                    final itemPosition = index * itemSize; // Calculate the position of the item
+                    final itemPosition = index * itemSize;
                     final difference = scrollController.offset - itemPosition;
-                    final percent = 1 - (difference / (itemSize/2));
+                    final percent = 1 - (difference / (itemSize / 2));
                     double opacity = percent;
                     double scale = percent;
                     if (opacity > 1.0) opacity = 1.0;
                     if (opacity < 0.0) opacity = 0.0;
                     if (percent > 1.0) scale = 1.0;
+
                     return Align(
                       heightFactor: 0.8,
                       child: Opacity(
@@ -66,43 +66,73 @@ class _CardListState extends State<CardList> {
                         child: Transform(
                           alignment: Alignment.center,
                           transform: Matrix4.identity()..scale(scale, 1.0),
-                          child: Card(
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                bottomRight: Radius.circular(20),
-                              ),
-                            ),
-                            color: Color(topicCard.color), // Correct the color usage
-                            child: SizedBox(
-                              height: itemSize, // Use itemSize if needed for sizing
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center, // Center content
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      topicCard.words,
-                                      style: const TextStyle(
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        DetailPage(topicCard: topicCard)),
+                              );
+                            },
+                            child: Hero(
+                                tag:
+                                    'heroCard${topicCard.words}', // Ensure each card has a unique tag, topicCard.id should be unique
+                                child: Card(
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(20),
+                                      topRight: Radius.circular(20),
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
+                                  color: Color(topicCard.color),
+                                  child: SizedBox(
+                                    height: itemSize,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment
+                                          .spaceBetween, // Space between items
+                                      crossAxisAlignment: CrossAxisAlignment
+                                          .center, // Center items vertically
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              topicCard.words,
+                                              style: const TextStyle(
+                                                fontSize: 30,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              textAlign: TextAlign
+                                                  .left, // Align text to the left
+                                            ),
+                                          ),
+                                        ),
+                                        if (topicCard.imagePath != null)
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Image.asset(
+                                              topicCard.imagePath!,
+                                              width: 100,
+                                              fit: BoxFit
+                                                  .cover, // This ensures the image covers the width but maintains its aspect ratio
+                                            ),
+                                          ),
+                                        // Optionally, you can add an 'else' block to display a default image or widget
+                                      ],
+                                    ),
+                                  ),
+                                )),
                           ),
                         ),
                       ),
                     );
                   } else {
-                    return null; // Return null for indices outside the list range
+                    return null;
                   }
                 },
-                childCount: topicCards.length, // Define the number of children in the list
+                childCount: topicCards.length,
               ),
-            ),
+            )
           ],
         ),
       ),
