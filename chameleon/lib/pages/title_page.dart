@@ -1,9 +1,12 @@
-import 'package:chameleon/pages/waiting_page.dart';
+// ignore_for_file: unused_import
+
+import 'package:chameleon/pages/waiting_people_page.dart';
 import 'package:chameleon/pages/topic_page.dart';
 import '../widgets/database_manager.dart';
 import 'package:flutter/material.dart';
 import '../widgets/wide_button.dart';
 import 'join_page.dart';
+import 'waiting_page.dart';
 
 class TitlePage extends StatelessWidget {
   const TitlePage({super.key});
@@ -44,11 +47,11 @@ class TitlePage extends StatelessWidget {
                   await DatabaseManager.storeRoomCode(roomCode);
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const WaitingPage()),
+                    MaterialPageRoute(builder: (context) => const WaitingPage(isHost: true,)),
                   );
                 }, // Corrected: Pass function reference
               ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 15),
             WideButton(
               text: 'Join Game',
               onPressed: () async{
@@ -60,7 +63,7 @@ class TitlePage extends StatelessWidget {
                   );
                 }, // Corre
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 15),
             WideButton(
               text: 'Topics',
               onPressed: (){
