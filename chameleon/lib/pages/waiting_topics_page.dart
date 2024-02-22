@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/display_grid.dart';
+import '../widgets/selectable_grid.dart';
 import '../widgets/wide_button.dart';
 
 class WaitingTopicsPage extends StatelessWidget {
@@ -11,17 +11,19 @@ class WaitingTopicsPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          const DisplayGrid(
+          const SelectableGrid(
             displayList: ['topic1', 'topic2', 'topic3', 'topic4'], // Example usernames
+            color: Colors.grey,
           ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 40),
-            child: WideButton(
-              text: 'Cancel',
-              color: Colors.red,
-              onPressed: () => Navigator.pop(context),
-            ),
-          ),
+          const SizedBox(height: 40),
+          // Padding(
+          //   padding: const EdgeInsets.only(bottom: 40),
+          //   child: WideButton(
+          //     text: 'Cancel',
+          //     color: Colors.red,
+          //     onPressed: () => Navigator.pop(context),
+          //   ),
+          // ),
         ],
       ),
     );

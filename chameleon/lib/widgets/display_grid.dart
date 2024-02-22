@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 
 class DisplayGrid extends StatelessWidget {
-  final List<String> displayList;
+  final List<String> userList;
+  final List<bool> hasVoted; // New list of booleans
   final int crossAxisCount;
+  final Color trueColor; // Color for items with true boolean value
+  final Color falseColor; // Color for items with false boolean value
 
   const DisplayGrid({
-    super.key, 
-    required this.displayList,
-    this.crossAxisCount = 2, // Set the default value to 2
-    });
+    super.key,
+    required this.userList,
+    required this.hasVoted, // Add hasVoted to constructor
+    this.crossAxisCount = 2,
+    this.trueColor = Colors.green, // Default color for true values
+    this.falseColor = Colors.blue, // Default color for false values
+  }) : assert(userList.length == hasVoted.length, 'The length of userList and hasVoted must be the same.');
 
   @override
   Widget build(BuildContext context) {
-    // Wrap the CustomScrollView in a Flexible widget
     return Flexible(
       child: CustomScrollView(
         slivers: [
@@ -20,26 +25,28 @@ class DisplayGrid extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             sliver: SliverGrid(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount, // Determines the number of columns
-                crossAxisSpacing: 10, // Space between columns
-                mainAxisSpacing: 10, // Space between rows
-                childAspectRatio: 2, // Adjust the aspect ratio of the grid items
+                crossAxisCount: crossAxisCount,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 2,
               ),
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
+                  // Determine color based on the boolean value
+                  Color itemColor = hasVoted[index] ? trueColor : falseColor;
                   return Container(
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: Colors.blue,
+                      color: itemColor,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
-                      displayList[index],
+                      userList[index],
                       style: const TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   );
                 },
-                childCount: displayList.length, // The total number of grid items
+                childCount: userList.length,
               ),
             ),
           ),

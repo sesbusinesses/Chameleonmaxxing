@@ -11,13 +11,14 @@ class WaitingPeoplePage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
-          const DisplayGrid(
-            displayList: ['Player1', 'Player2', 'Player3', 'Player4'], // Example usernames
+          DisplayGrid(
+            userList: const ['Player1', 'Player2', 'Player3', 'Player4'], // Example usernames
+            hasVoted: const [true, false, true, false], // Example boolean values
           ),
           Padding(
             padding: const EdgeInsets.only(bottom: 40),
             child: WideButton(
-              text: 'Cancel',
+              text: 'Leave Game',
               color: Colors.red,
               onPressed: () => Navigator.pop(context),
             ),
