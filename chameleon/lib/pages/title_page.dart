@@ -1,5 +1,6 @@
 import 'package:chameleon/pages/waiting_page.dart';
 import 'package:chameleon/pages/topic_page.dart';
+import '../widgets/database_manager.dart';
 import 'package:flutter/material.dart';
 import '../widgets/wide_button.dart';
 import 'join_page.dart';
@@ -38,7 +39,9 @@ class TitlePage extends StatelessWidget {
               children: <Widget>[
                 WideButton(
                 text: 'Create Game',
-                onPressed: (){
+                onPressed: () async {
+                  String roomCode = DatabaseManager.generateCode();
+                  await DatabaseManager.storeRoomCode(roomCode);
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const WaitingPage()),
@@ -48,7 +51,9 @@ class TitlePage extends StatelessWidget {
             const SizedBox(height: 10),
             WideButton(
               text: 'Join Game',
-              onPressed: (){
+              onPressed: () async{
+                  String playerID = DatabaseManager.generateCode();
+                  await DatabaseManager.storePlayerID(playerID);
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const JoinPage()),
