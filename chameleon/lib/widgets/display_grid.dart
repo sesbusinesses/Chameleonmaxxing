@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class DisplayGrid extends StatelessWidget {
-  final List<String> usernames;
+  final List<String> displayList;
   final int crossAxisCount;
 
   const DisplayGrid({
     super.key, 
-    required this.usernames,
+    required this.displayList,
     this.crossAxisCount = 2, // Set the default value to 2
     });
 
@@ -34,12 +34,12 @@ class DisplayGrid extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
-                      usernames[index],
+                      displayList[index],
                       style: const TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   );
                 },
-                childCount: usernames.length, // The total number of grid items
+                childCount: displayList.length, // The total number of grid items
               ),
             ),
           ),
