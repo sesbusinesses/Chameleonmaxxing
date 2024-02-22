@@ -4,22 +4,23 @@ import 'waiting_people_page.dart';
 import 'waiting_topics_page.dart';
 
 class WaitingPage extends StatelessWidget {
-  const WaitingPage({super.key});
+  final bool isHost; // Allow external initialization
+
+  // Modified constructor to accept isHost value
+  const WaitingPage({super.key, this.isHost = false});
 
   @override
   Widget build(BuildContext context) {
-    // Scaffold to provide appBar and structure
     return Scaffold(
       appBar: AppBar(
         title: const Text('Join Code: ABCXYZ'),
         automaticallyImplyLeading: false, // Removes the back arrow
       ),
-      // PageView for horizontal swiping
       body: PageView(
-        scrollDirection: Axis.horizontal, // Specifies the swiping direction
-        children: const <Widget>[
-          WaitingPeoplePage(), // First instance of the WaitingPage
-          WaitingTopicsPage(), // Second instance, can customize differently if needed
+        scrollDirection: Axis.horizontal,
+        children: <Widget>[
+          WaitingPeoplePage(isHost: isHost), // Pass isHost to WaitingPeoplePage
+          const WaitingTopicsPage(), // No changes needed here
         ],
       ),
     );

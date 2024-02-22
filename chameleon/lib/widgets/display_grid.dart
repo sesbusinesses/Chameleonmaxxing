@@ -7,14 +7,14 @@ class DisplayGrid extends StatelessWidget {
   final Color trueColor; // Color for items with true boolean value
   final Color falseColor; // Color for items with false boolean value
 
-  const DisplayGrid({
+  DisplayGrid({
     super.key,
     required this.userList,
-    required this.hasVoted, // Add hasVoted to constructor
+    List<bool>? hasVoted,
     this.crossAxisCount = 2,
-    this.trueColor = Colors.green, // Default color for true values
-    this.falseColor = Colors.blue, // Default color for false values
-  }) : assert(userList.length == hasVoted.length, 'The length of userList and hasVoted must be the same.');
+    this.trueColor = Colors.green,
+    this.falseColor = Colors.blue,
+  }) : hasVoted = hasVoted ?? List<bool>.filled(userList.length, true); // Default to all true if not provided
 
   @override
   Widget build(BuildContext context) {

@@ -10,19 +10,18 @@ class WaitingTopicsPage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: <Widget>[
+          Text(
+            'Choose a Topic',
+            style: TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           SelectableGrid(
             displayList: ['topic1', 'topic2', 'topic3', 'topic4'], // Example usernames
             color: Colors.grey,
           ),
           SizedBox(height: 40),
-          // Padding(
-          //   padding: const EdgeInsets.only(bottom: 40),
-          //   child: WideButton(
-          //     text: 'Cancel',
-          //     color: Colors.red,
-          //     onPressed: () => Navigator.pop(context),
-          //   ),
-          // ),
         ],
       ),
     );

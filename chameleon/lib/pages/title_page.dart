@@ -44,11 +44,11 @@ class TitlePage extends StatelessWidget {
                 onPressed: (){
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const WaitingPage()),
+                    MaterialPageRoute(builder: (context) => const WaitingPage(isHost: true,)),
                   );
                 }, // Corrected: Pass function reference
               ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 15),
             WideButton(
               text: 'Join Game',
               onPressed: (){
@@ -58,7 +58,7 @@ class TitlePage extends StatelessWidget {
                   );
                 }, // Corre
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 15),
             WideButton(
               text: 'Topics',
               onPressed: (){
