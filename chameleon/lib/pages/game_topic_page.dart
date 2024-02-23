@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/display_grid.dart';
 import '../widgets/reveal_button.dart';
-import '../widgets/wide_button.dart'; // Assuming DisplayGrid can be used or adapted for topics
+// Assuming DisplayGrid can be used or adapted for topics
 
 class GameTopicPage extends StatelessWidget {
   const GameTopicPage({super.key});

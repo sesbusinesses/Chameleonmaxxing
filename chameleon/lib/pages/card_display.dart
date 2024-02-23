@@ -4,13 +4,13 @@ import 'package:chameleon/models/topic_card.dart';
 class DetailPage extends StatelessWidget {
   final TopicCard topicCard;
 
-  const DetailPage({Key? key, required this.topicCard}) : super(key: key);
+  const DetailPage({super.key, required this.topicCard});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Detail'),
+        title: const Text('Detail'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
@@ -26,7 +26,7 @@ class DetailPage extends StatelessWidget {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     topicCard.words,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
                     ),
