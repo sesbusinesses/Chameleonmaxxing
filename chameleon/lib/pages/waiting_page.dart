@@ -4,23 +4,24 @@ import 'waiting_people_page.dart';
 import 'waiting_topics_page.dart';
 
 class WaitingPage extends StatelessWidget {
-  final bool isHost; // Allow external initialization
+  final bool isHost;
+  final String roomCode; // Add roomCode as a required parameter
 
-  // Modified constructor to accept isHost value
-  const WaitingPage({super.key, this.isHost = false});
+  // Update constructor to include roomCode
+   const WaitingPage({super.key, this.isHost = false, required this.roomCode});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Join Code: ABCXYZ'),
+        title: Text('Join Code: $roomCode'), // Use roomCode in AppBar title
         automaticallyImplyLeading: false, // Removes the back arrow
       ),
       body: PageView(
         scrollDirection: Axis.horizontal,
         children: <Widget>[
-          WaitingPeoplePage(isHost: isHost), // Pass isHost to WaitingPeoplePage
-          const WaitingTopicsPage(), // No changes needed here
+          WaitingPeoplePage(isHost: isHost), // No change needed here
+           const WaitingTopicsPage(), // No changes needed here
         ],
       ),
     );
