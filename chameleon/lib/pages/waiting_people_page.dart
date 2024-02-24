@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/database_manager.dart';
 import '../widgets/display_grid.dart';
 import '../widgets/wide_button.dart';
 import 'game_page.dart';
@@ -45,7 +46,17 @@ class WaitingPeoplePage extends StatelessWidget {
             child: WideButton(
               text: 'Leave Game',
               color: Colors.red,
-              onPressed: () => Navigator.pop(context),
+              onPressed: () async {
+                // to-do : Still need to find a way to get roomCode and playerId
+                String roomCode = "K22W824WUH"; // sample code
+                String playerId = "RW1KW7PQ4R"; // sample code
+
+                await DatabaseManager.removePlayerFromRoom(roomCode, playerId);
+
+                //to-do : if ishost=true, then remove the entire room. And maybe kick out all players(?). 
+
+                Navigator.pop(context);
+              },
             ),
           ),
         ],

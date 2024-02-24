@@ -39,7 +39,7 @@ class DatabaseManager {
     } 
   }
 
-   static Future<bool> doesRoomExist(String roomCode) async {
+  static Future<bool> doesRoomExist(String roomCode) async {
     var roomQuery = await FirebaseFirestore.instance
         .collection('room_code')
         .where('code', isEqualTo: roomCode)
@@ -47,6 +47,23 @@ class DatabaseManager {
         .get();
 
     return roomQuery.docs.isNotEmpty;
+  }
+
+  static Future<void> removePlayerFromRoom(String roomCode, String playerId) async {
+    var roomQuery = await FirebaseFirestore.instance
+        .collection('room_code')
+        .where('code', isEqualTo: roomCode)
+        .limit(1)
+        .get();
+
+    if (roomQuery.docs.isNotEmpty) {
+      await FirebaseFirestore.instance
+          .collection('room_code')
+          .doc(roomQuery.docs.first.id)
+          .update({
+            'players': FieldValue.arrayRemove([playerId]) // Remove the player ID from the players array
+          });
+    } 
   }
 
 }
