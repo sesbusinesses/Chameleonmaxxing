@@ -20,7 +20,6 @@ class _CardListState extends State<CardList> {
 
   @override
   void initState() {
-    topicCards.addAll(List.from(topicCards));
     super.initState();
     scrollController.addListener(onListen); // Add listener to the controller
   }
