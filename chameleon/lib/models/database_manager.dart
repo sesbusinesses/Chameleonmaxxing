@@ -18,6 +18,7 @@ class DatabaseManager {
     return roomCode; // Correctly return the room code for further use
   }
 
+  //is this method used? delete if not
   static Future<void> storePlayerID(String code) async {
     await FirebaseFirestore.instance.collection('PlayID').add({'code': code});
   }

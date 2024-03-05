@@ -43,6 +43,7 @@ class TitlePage extends StatelessWidget {
                       MaterialPageRoute(builder: (context) => WaitingPage(
                         isHost: true,
                         roomCode: roomCode,
+                        playerId: creatorID
                       )),
                     );
                   },
