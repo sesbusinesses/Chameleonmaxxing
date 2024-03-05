@@ -18,10 +18,6 @@ class DatabaseManager {
     return roomCode; // Correctly return the room code for further use
   }
 
-  //is this method used? delete if not
-  static Future<void> storePlayerID(String code) async {
-    await FirebaseFirestore.instance.collection('PlayID').add({'code': code});
-  }
 
   static Future<void> addPlayerToRoom(String roomCode, String playerId) async {
     var roomQuery = await FirebaseFirestore.instance
@@ -50,6 +46,7 @@ class DatabaseManager {
     return roomQuery.docs.isNotEmpty;
   }
 
+  // Remove a player ID from the room
   static Future<void> removePlayerFromRoom(String roomCode, String playerId) async {
     var roomQuery = await FirebaseFirestore.instance
         .collection('room_code')
@@ -65,6 +62,22 @@ class DatabaseManager {
             'players': FieldValue.arrayRemove([playerId]) // Remove the player ID from the players array
           });
     } 
+  }
+
+  // this method removes the entire room if the user is the host
+  static Future<void> removeEntireRoom(String roomCode) async {
+    var roomQuery = await FirebaseFirestore.instance
+        .collection('room_code')
+        .where('code', isEqualTo: roomCode)
+        .limit(1)
+        .get();
+
+    if (roomQuery.docs.isNotEmpty) {
+      await FirebaseFirestore.instance
+          .collection('room_code')
+          .doc(roomQuery.docs.first.id)
+          .delete();
+    }
   }
 
 }

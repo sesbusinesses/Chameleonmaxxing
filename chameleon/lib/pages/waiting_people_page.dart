@@ -3,6 +3,7 @@ import '../models/database_manager.dart';
 import '../widgets/display_grid.dart';
 import '../widgets/wide_button.dart';
 import 'game_page.dart';
+import '../widgets/utility.dart';
 
 class WaitingPeoplePage extends StatelessWidget {
   final bool isHost; // Correctly declare as final
@@ -35,7 +36,7 @@ class WaitingPeoplePage extends StatelessWidget {
               child: WideButton(
                 text: 'Start Game',
                 color: Colors.green,
-                onPressed: () {
+                onPressed: () {                  
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => const GamePage()),
@@ -49,9 +50,11 @@ class WaitingPeoplePage extends StatelessWidget {
               text: 'Leave Game',
               color: Colors.red,
               onPressed: () async {
-                await DatabaseManager.removePlayerFromRoom(roomCode, playerId);
 
-                //to-do : if ishost=true, then remove the entire room. And maybe kick out all players(?). 
+                if (isHost) {
+                  await DatabaseManager.removeEntireRoom(roomCode);
+                }
+                await DatabaseManager.removePlayerFromRoom(roomCode, playerId);
 
                 Navigator.pop(context);
               },
@@ -62,3 +65,13 @@ class WaitingPeoplePage extends StatelessWidget {
     );
   }
 }
+
+//this should come with the update of playID display.
+//check if the room still exists, in case the host left.
+/*
+var roomStillExists = await DatabaseManager.doesRoomExist(roomCode);
+if(!roomStillExists){
+  showMessage(context,'Host left. The room does not exist anymore.');
+  return;                    
+}
+*/

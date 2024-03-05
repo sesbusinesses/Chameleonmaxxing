@@ -3,6 +3,7 @@ import '../models/database_manager.dart';
 import '../widgets/wide_button.dart';
 import '../widgets/text_box.dart';
 import 'waiting_page.dart';
+import '../widgets/utility.dart';
 
 class JoinPage extends StatefulWidget {
   const JoinPage({super.key});
@@ -17,14 +18,14 @@ class JoinPageState extends State<JoinPage> {
   void _tryJoinGame() async {
     String roomCode = _nameController.text.trim();
     if (roomCode.isEmpty) {
-      _showMessage('Join code cannot be empty');
+      showMessage(context,'Join code cannot be empty');
       return;
     }
 
     // Check if the room exists before attempting to join
     var roomExists = await DatabaseManager.doesRoomExist(roomCode);
     if (!roomExists) {
-      _showMessage('Room does not exist');
+      showMessage(context,'Room does not exist');
       return;
     }
 
@@ -39,26 +40,11 @@ class JoinPageState extends State<JoinPage> {
       );
     } catch (e) {
       // Handle any errors during the process
-      _showMessage('An error occurred while trying to join the room');
+      showMessage(context,'An error occurred while trying to join the room');
     }
   }
 
-
-  void _showMessage(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Error'),
-        content: Text(message),
-        actions: <Widget>[
-          TextButton(
-            child: const Text('OK'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-      ),
-    );
-  }
+  
 
   @override
   Widget build(BuildContext context) {
