@@ -54,7 +54,7 @@ final List<TopicCard> topicCards = [
   TopicCard(
     words: 'Kpop Idols',
     color: 0xFFd6ccc2,
-    wordList: ['Tzuyu', 'Chaewon', 'Jungkook', 'Jennie', 'Sakura', 'Momo', 'Sana', 'IU', 'Taehyung', 'Yuna'],
+    wordList: ['CHAEWON','Tzuyu', 'Jungkook', 'Jennie', 'Sakura', 'Momo', 'Sana', 'IU', 'Taehyung', 'Yuna'],
   ),
 ];
 
