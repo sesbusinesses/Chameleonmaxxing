@@ -30,11 +30,12 @@ class JoinPageState extends State<JoinPage> {
 
     // If the room exists, attempt to add the player
     try {
-      await DatabaseManager.addPlayerToRoom(roomCode, DatabaseManager.generateCode()); // Use actual logic to generate/get player ID
+      String playerId = DatabaseManager.generateCode();
+      await DatabaseManager.addPlayerToRoom(roomCode, playerId); // Use actual logic to generate/get player ID
       // Navigate to WaitingPage if adding is successful
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => WaitingPage(roomCode: roomCode)),
+        MaterialPageRoute(builder: (context) => WaitingPage(roomCode: roomCode, playerId: playerId)),
       );
     } catch (e) {
       // Handle any errors during the process

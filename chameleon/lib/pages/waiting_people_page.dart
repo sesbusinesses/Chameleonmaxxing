@@ -6,9 +6,11 @@ import 'game_page.dart';
 
 class WaitingPeoplePage extends StatelessWidget {
   final bool isHost; // Correctly declare as final
+  final String roomCode;
+  final String playerId;
 
   // Correct constructor to initialize isHost
-  const WaitingPeoplePage({super.key, required this.isHost});
+  const WaitingPeoplePage({super.key, required this.isHost, required this.roomCode, required this.playerId});
 
   @override
   Widget build(BuildContext context) {
@@ -47,10 +49,6 @@ class WaitingPeoplePage extends StatelessWidget {
               text: 'Leave Game',
               color: Colors.red,
               onPressed: () async {
-                // to-do : Still need to find a way to get roomCode and playerId
-                String roomCode = "K22W824WUH"; // sample code
-                String playerId = "RW1KW7PQ4R"; // sample code
-
                 await DatabaseManager.removePlayerFromRoom(roomCode, playerId);
 
                 //to-do : if ishost=true, then remove the entire room. And maybe kick out all players(?). 
