@@ -3,7 +3,7 @@ import '../models/database_manager.dart';
 import '../widgets/display_grid.dart';
 import '../widgets/wide_button.dart';
 import 'game_page.dart';
-import '../widgets/utility.dart'; // Assuming utility.dart for showMessage
+import '../widgets/utility.dart';
 
 class WaitingPeoplePage extends StatefulWidget {
   final bool isHost;

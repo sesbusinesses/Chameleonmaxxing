@@ -17,6 +17,7 @@ class JoinPageState extends State<JoinPage> {
 
   void _tryJoinGame() async {
     String roomCode = _nameController.text.trim();
+    roomCode = roomCode.toUpperCase();
     if (roomCode.isEmpty) {
       showMessage(context,'Join code cannot be empty');
       return;
