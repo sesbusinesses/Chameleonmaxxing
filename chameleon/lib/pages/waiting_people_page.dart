@@ -3,7 +3,6 @@ import '../models/database_manager.dart';
 import '../widgets/display_grid.dart';
 import '../widgets/wide_button.dart';
 import 'game_page.dart';
-import '../widgets/utility.dart';
 
 class WaitingPeoplePage extends StatelessWidget {
   final bool isHost; // Correctly declare as final

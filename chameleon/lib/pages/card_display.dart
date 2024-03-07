@@ -4,7 +4,7 @@ import 'package:chameleon/models/topic_card.dart'; // Ensure this import matches
 class DetailPage extends StatelessWidget {
   final TopicCard topicCard;
 
-  const DetailPage({Key? key, required this.topicCard}) : super(key: key);
+  const DetailPage({super.key, required this.topicCard});
 
   @override
   Widget build(BuildContext context) {
