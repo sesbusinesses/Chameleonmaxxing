@@ -23,10 +23,10 @@ class DatabaseManager {
 
   static Future<void> addPlayerToRoom(String roomCode, String playerId) async {
     var roomQuery = await FirebaseFirestore.instance
-        .collection('room_code')
-        .where('code', isEqualTo: roomCode)
-        .limit(1)
-        .get();
+    .collection('room_code')
+    .where('code', isEqualTo: roomCode)
+    .limit(1)
+    .get();
 
     if (roomQuery.docs.isNotEmpty) {
       await FirebaseFirestore.instance
