@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/database_manager.dart';
 import '../widgets/selectable_grid.dart';
+import '../helpers/list_fetcher.dart';
 
 class WaitingTopicsPage extends StatelessWidget {
   final String playerId;
@@ -25,25 +26,43 @@ class WaitingTopicsPage extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          SelectableGrid(
-            displayList: ['topic1', 'topic2', 'topic3', 'topic4'],
-            color: Colors.grey,
-            updateField: 'votingTopic',
-            onSelectionConfirmed: (selectedTopic) {
-              DatabaseManager.setPlayerVotingTopic(
-                      roomCode, playerId, selectedTopic)
-                  .then((_) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('You selected "$selectedTopic"')),
-                );
-              }).catchError((error) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Error updating your choice')),
-                );
-              });
+          FutureBuilder<List<String>>(
+            future: fetchTopics(),
+            builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  // Once data is fetched, pass it to the SelectableGrid
+                  return SelectableGrid(
+                    displayList: snapshot.data!, // Use the fetched list of topics
+                    color: Colors.grey,
+                    updateField: 'votingTopic',
+                    onSelectionConfirmed: (selectedTopic) {
+                      DatabaseManager.setPlayerVotingTopic(
+                        roomCode, playerId, selectedTopic)
+                        .then((_) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('You selected "$selectedTopic"')),
+                          );
+                        }).catchError((error) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error updating your choice')),
+                          );
+                        });
+                    },
+                  );
+                } else if (snapshot.hasError) {
+                  // Handle errors
+                  return Text('Error fetching topics: ${snapshot.error}');
+                } else {
+                  // No data
+                  return Text('No topics found');
+                }
+              } else {
+                // While data is loading
+                return CircularProgressIndicator();
+              }
             },
           ),
-          const SizedBox(height: 40),
         ],
       ),
     );
