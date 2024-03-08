@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
-
 import '../models/database_manager.dart';
-import 'wide_button.dart';
+import 'wide_button.dart'; // Adjust the import path as necessary
 
 class SelectableGrid extends StatefulWidget {
   final List<String> displayList;
   final int crossAxisCount;
   final Color color;
-  final Function(String)? onSelectionConfirmed;
-  final String
-      updateField; // New input to specify the field to update in the database
+  final String updateField; // 'votingCham' or 'votingTopic'
+  final String roomCode;
+  final String playerId;
 
   const SelectableGrid({
     super.key,
     required this.displayList,
     this.crossAxisCount = 2,
     this.color = Colors.blue,
-    this.onSelectionConfirmed,
-    required this.updateField, // Ensure this parameter is required
+    required this.updateField,
+    required this.roomCode,
+    required this.playerId,
   });
 
   @override
@@ -29,9 +29,27 @@ class SelectableGridState extends State<SelectableGrid> {
   bool _isSelectionConfirmed = false;
 
   @override
+  void initState() {
+    super.initState();
+    _fetchInitialSelection();
+  }
+
+  void _fetchInitialSelection() async {
+    String? initialSelection = await DatabaseManager.fetchInitialSelection(
+        widget.roomCode, widget.playerId, widget.updateField);
+    if (initialSelection != null &&
+        widget.displayList.contains(initialSelection)) {
+      setState(() {
+        _selectedItemIndex = widget.displayList.indexOf(initialSelection);
+        _isSelectionConfirmed =
+            true; // Confirm selection if there's an initial one
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Expanded(
-        child: Column(
+    return Column(
       children: [
         Expanded(
           child: GridView.builder(
@@ -46,13 +64,18 @@ class SelectableGridState extends State<SelectableGrid> {
             itemBuilder: (context, index) {
               final bool isSelected = _selectedItemIndex == index;
               return GestureDetector(
-                onTap: !_isSelectionConfirmed
-                    ? () {
+                onTap: _isSelectionConfirmed
+                    ? null
+                    : () {
                         setState(() {
-                          _selectedItemIndex = isSelected ? null : index;
+                          _selectedItemIndex = index;
                         });
-                      }
-                    : null,
+                        DatabaseManager.updatePlayerSelection(
+                            widget.roomCode,
+                            widget.playerId,
+                            widget.updateField,
+                            widget.displayList[index]);
+                      },
                 child: Container(
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
@@ -71,10 +94,9 @@ class SelectableGridState extends State<SelectableGrid> {
             },
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 20),
-          child: Visibility(
-            visible: !_isSelectionConfirmed,
+        if (!_isSelectionConfirmed) // Only show the vote button if no selection has been confirmed
+          Padding(
+            padding: const EdgeInsets.only(top: 20),
             child: WideButton(
               text: 'Vote',
               onPressed: () {
@@ -82,34 +104,15 @@ class SelectableGridState extends State<SelectableGrid> {
                   setState(() {
                     _isSelectionConfirmed = true;
                   });
-                  // Use the selected item's string to update the votingCham in the database
-                  String selectedOption =
+                  final selectedOption =
                       widget.displayList[_selectedItemIndex!];
-                  // Assuming you have access to the player ID and room code
-                  String playerId =
-                      "..."; // You need to pass the actual player ID
-                  String roomCode =
-                      "..."; // You need to pass the actual room code
-
-                  if (widget.updateField == "votingCham") {
-                    DatabaseManager.setPlayerVotingCham(
-                        roomCode, playerId, selectedOption);
-                  }
-
-                  if (widget.updateField == "votingTopic") {
-                    DatabaseManager.setPlayerVotingTopic(
-                        roomCode, playerId, selectedOption);
-                  }
-
-                  if (widget.onSelectionConfirmed != null) {
-                    widget.onSelectionConfirmed!(selectedOption);
-                  }
+                  DatabaseManager.updatePlayerSelection(widget.roomCode,
+                      widget.playerId, widget.updateField, selectedOption);
                 }
               },
             ),
           ),
-        ),
       ],
-    ));
+    );
   }
 }

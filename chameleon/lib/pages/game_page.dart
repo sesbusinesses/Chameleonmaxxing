@@ -22,7 +22,7 @@ class GamePage extends StatelessWidget {
       body: PageView(
         scrollDirection: Axis.horizontal,
         children: <Widget>[
-          GameTopicPage(), // Hypothetically passing roomCode
+          const GameTopicPage(), // Hypothetically passing roomCode
           GamePeoplePage(
               playerId: playerId,
               roomCode: roomCode), // Passing both roomId and playerId
