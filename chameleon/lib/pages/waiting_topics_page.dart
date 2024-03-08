@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../models/database_manager.dart';
 import '../widgets/selectable_grid.dart';
 import '../helpers/list_fetcher.dart';
 
@@ -15,55 +14,49 @@ class WaitingTopicsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          const Text(
-            'Choose a Topic',
-            style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            const Text(
+              'Choose a Topic',
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          FutureBuilder<List<String>>(
-            future: fetchTopics(),
-            builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                  // Once data is fetched, pass it to the SelectableGrid
-                  return SelectableGrid(
-                    displayList: snapshot.data!, // Use the fetched list of topics
-                    color: Colors.grey,
-                    updateField: 'votingTopic',
-                    onSelectionConfirmed: (selectedTopic) {
-                      DatabaseManager.setPlayerVotingTopic(
-                        roomCode, playerId, selectedTopic)
-                        .then((_) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('You selected "$selectedTopic"')),
-                          );
-                        }).catchError((error) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Error updating your choice')),
-                          );
-                        });
-                    },
-                  );
-                } else if (snapshot.hasError) {
-                  // Handle errors
-                  return Text('Error fetching topics: ${snapshot.error}');
-                } else {
-                  // No data
-                  return Text('No topics found');
-                }
-              } else {
-                // While data is loading
-                return CircularProgressIndicator();
-              }
-            },
-          ),
-        ],
+            Expanded(
+              // Use FutureBuilder to dynamically fetch topics
+              child: FutureBuilder<List<String>>(
+                future: fetchTopics(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                      // Data is available, use it in SelectableGrid
+                      return SelectableGrid(
+                        displayList: snapshot.data!, // Use the fetched topics
+                        color: Colors.grey,
+                        updateField: 'votingTopic',
+                        roomCode: roomCode,
+                        playerId: playerId,
+                      );
+                    } else if (snapshot.hasError) {
+                      // Handle errors
+                      return Text('Error fetching topics: ${snapshot.error}');
+                    } else {
+                      // No data
+                      return Text('No topics found');
+                    }
+                  }
+                  // While data is loading
+                  return CircularProgressIndicator();
+                },
+              ),
+            ),
+            const SizedBox(height: 40),
+          ],
+        ),
       ),
     );
   }
