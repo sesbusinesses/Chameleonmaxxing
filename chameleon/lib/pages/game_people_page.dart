@@ -15,54 +15,48 @@ class GamePeoplePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: FutureBuilder<List<String>>(
-          future: DatabaseManager.getPlayerUsernames(roomCode),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-              // Adjust the layout to be similar to WaitingTopicsPage
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  const Text(
-                    'Choose a Player',
+      appBar: AppBar(
+        title: Text(
+            'Game: $roomCode'), // Display room code in AppBar title for reference
+        automaticallyImplyLeading: false,
+      ),
+      body: FutureBuilder<List<String>>(
+        future: DatabaseManager.getPlayerUsernames(roomCode),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                const Padding(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    'Vote for the Chameleon',
                     style: TextStyle(
-                      fontSize: 30,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SelectableGrid(
+                ),
+                Expanded(
+                  child: SelectableGrid(
                     displayList: snapshot.data!,
                     color: Colors.grey,
                     updateField: 'votingCham',
-                    onSelectionConfirmed: (selectedPlayer) {
-                      // Assuming a method to update player voting status
-                      DatabaseManager.setPlayerVotingCham(
-                              roomCode, playerId, selectedPlayer)
-                          .then((_) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                              content: Text('You voted for "$selectedPlayer"')),
-                        );
-                      }).catchError((error) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Error updating your vote')),
-                        );
-                      });
-                    },
+                    roomCode: roomCode,
+                    playerId: playerId,
                   ),
-                  const SizedBox(height: 40),
-                ],
-              );
-            } else {
-              return const Text('No players found');
-            }
-          },
-        ),
+                ),
+                const SizedBox(height: 20),
+              ],
+            );
+          } else {
+            return const Center(child: Text('No players found'));
+          }
+        },
       ),
     );
   }

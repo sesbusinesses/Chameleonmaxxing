@@ -35,10 +35,6 @@ class _WaitingPeoplePageState extends State<WaitingPeoplePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Waiting for Players'),
-        automaticallyImplyLeading: false,
-      ),
       body: FutureBuilder<List<dynamic>>(
         future: Future.wait([playerNamesFuture, hasVotedFuture]),
         builder: (context, snapshot) {

@@ -6,7 +6,7 @@ import 'waiting_page.dart';
 import '../widgets/utility.dart'; // Assuming this contains the showMessage function
 
 class JoinPage extends StatefulWidget {
-  const JoinPage({Key? key}) : super(key: key);
+  const JoinPage({super.key});
 
   @override
   JoinPageState createState() => JoinPageState();
