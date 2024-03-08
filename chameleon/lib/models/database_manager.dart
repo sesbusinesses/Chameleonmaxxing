@@ -2,6 +2,8 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseManager {
+  static final FirebaseFirestore _db = FirebaseFirestore.instance;
+
   static String generateCode() {
     const String chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     Random rnd = Random();
@@ -9,67 +11,77 @@ class DatabaseManager {
         10, (_) => chars.codeUnitAt(rnd.nextInt(chars.length))));
   }
 
-  // Corrected method to create a room and add the creator to it
-  static Future<String> createRoomWithCreator(String creatorId) async {
+  static Future<String> createRoomWithCreator(
+      String creatorId, String username) async {
     String roomCode = generateCode();
-    await FirebaseFirestore.instance.collection('room_code').add({
+    await _db.collection('room_code').doc(roomCode).set({
       'code': roomCode,
+      'gameRunning': false,
       'players': [
-        creatorId
-      ], // Add the creator's ID to the players array upon room creation
+        {
+          'isCham': false,
+          'playerID': creatorId,
+          'username': username,
+          'votingCham': "",
+          'votingTopic': "",
+        }
+      ]
     });
-    return roomCode; // Correctly return the room code for further use
+    return roomCode;
   }
 
-  static Future<void> addPlayerToRoom(String roomCode, String playerId) async {
-    var roomQuery = await FirebaseFirestore.instance
-    .collection('room_code')
-    .where('code', isEqualTo: roomCode)
-    .limit(1)
-    .get();
+  static Future<void> addPlayerToRoom(
+      String roomCode, String playerId, String username) async {
+    Map<String, dynamic> playerDetail = {
+      'isCham': false,
+      'playerID': playerId,
+      'username': username,
+      'votingCham': "",
+      'votingTopic': "",
+    };
 
-    if (roomQuery.docs.isNotEmpty) {
-      await FirebaseFirestore.instance
-          .collection('room_code')
-          .doc(roomQuery.docs.first.id)
-          .update({
-        'players': FieldValue.arrayUnion([playerId])
-      });
-    }
+    DocumentReference roomRef = _db.collection('room_code').doc(roomCode);
+    await roomRef.update({
+      'players': FieldValue.arrayUnion([playerDetail])
+    });
   }
 
   static Future<bool> doesRoomExist(String roomCode) async {
-    var roomQuery = await FirebaseFirestore.instance
-        .collection('room_code')
-        .where('code', isEqualTo: roomCode)
-        .limit(1)
-        .get();
-
-    return roomQuery.docs.isNotEmpty;
+    DocumentSnapshot roomDoc =
+        await _db.collection('room_code').doc(roomCode).get();
+    return roomDoc.exists;
   }
 
-  // Remove a player ID from the room
   static Future<void> removePlayerFromRoom(
       String roomCode, String playerId) async {
-    var roomQuery = await FirebaseFirestore.instance
-        .collection('room_code')
-        .where('code', isEqualTo: roomCode)
-        .limit(1)
-        .get();
-
-    if (roomQuery.docs.isNotEmpty) {
-      await FirebaseFirestore.instance
-          .collection('room_code')
-          .doc(roomQuery.docs.first.id)
-          .update({
-        'players': FieldValue.arrayRemove(
-            [playerId]) // Remove the player ID from the players array
-      });
+    DocumentReference roomRef = _db.collection('room_code').doc(roomCode);
+    DocumentSnapshot roomSnapshot = await roomRef.get();
+    if (roomSnapshot.exists) {
+      List<dynamic> players = roomSnapshot['players'];
+      List<dynamic> updatedPlayers =
+          players.where((player) => player['playerID'] != playerId).toList();
+      await roomRef.update({'players': updatedPlayers});
     }
   }
 
-  // this method removes the entire room if the user is the host
   static Future<void> removeEntireRoom(String roomCode) async {
+    await _db.collection('room_code').doc(roomCode).delete();
+  }
+
+  static Future<List<String>> getPlayerUsernames(String roomCode) async {
+    DocumentSnapshot roomSnapshot =
+        await _db.collection('room_code').doc(roomCode).get();
+    if (roomSnapshot.exists) {
+      List<dynamic> players = roomSnapshot['players'];
+      return players
+          .map<String>((player) => player['username'] as String)
+          .toList();
+    }
+    return [];
+  }
+
+  static Future<void> setPlayerVotingCham(
+      String roomCode, String playerId, String votingCham) async {
     var roomQuery = await FirebaseFirestore.instance
         .collection('room_code')
         .where('code', isEqualTo: roomCode)
@@ -77,15 +89,25 @@ class DatabaseManager {
         .get();
 
     if (roomQuery.docs.isNotEmpty) {
+      // Assuming 'players' is an array of maps
+      var docId = roomQuery.docs.first.id;
+      var players = List.from(roomQuery.docs.first.get('players'));
+      var updatedPlayers = players.map((player) {
+        if (player is Map && player['playerID'] == playerId) {
+          return {...player, 'votingCham': votingCham};
+        }
+        return player;
+      }).toList();
+
       await FirebaseFirestore.instance
           .collection('room_code')
-          .doc(roomQuery.docs.first.id)
-          .delete();
+          .doc(docId)
+          .update({'players': updatedPlayers});
     }
   }
 
-  // Fetch the list of player IDs from a room
-  static Future<List<String>> getPlayersInRoom(String roomCode) async {
+  static Future<void> setPlayerVotingTopic(
+      String roomCode, String playerId, String votingTopic) async {
     var roomQuery = await FirebaseFirestore.instance
         .collection('room_code')
         .where('code', isEqualTo: roomCode)
@@ -93,11 +115,64 @@ class DatabaseManager {
         .get();
 
     if (roomQuery.docs.isNotEmpty) {
-      // Assuming 'players' is stored as an array of strings (player IDs)
-      List<String> playerIds = List.from(roomQuery.docs.first.get('players'));
-      return playerIds;
-    } else {
-      return []; // Return an empty list if the room doesn't exist
+      // Assuming 'players' is an array of maps
+      var docId = roomQuery.docs.first.id;
+      var players = List.from(roomQuery.docs.first.get('players'));
+      var updatedPlayers = players.map((player) {
+        if (player is Map && player['playerID'] == playerId) {
+          return {...player, 'votingTopic': votingTopic};
+        }
+        return player;
+      }).toList();
+
+      await FirebaseFirestore.instance
+          .collection('room_code')
+          .doc(docId)
+          .update({'players': updatedPlayers});
+    }
+  }
+
+  static Future<List<bool>> getVotingChamStatus(String roomCode) async {
+    try {
+      DocumentSnapshot roomSnapshot =
+          await _db.collection('room_code').doc(roomCode).get();
+      if (roomSnapshot.exists && roomSnapshot.data() != null) {
+        List<dynamic> players = roomSnapshot.get('players');
+        return players
+            .map<bool>((player) =>
+                player['votingCham'] != null && player['votingCham'] != "")
+            .toList();
+      }
+    } catch (error) {
+      print('Error getting votingCham status: $error');
+    }
+    return [];
+  }
+
+  static Future<List<bool>> getVotingTopicStatus(String roomCode) async {
+    try {
+      DocumentSnapshot roomSnapshot =
+          await _db.collection('room_code').doc(roomCode).get();
+      if (roomSnapshot.exists && roomSnapshot.data() != null) {
+        List<dynamic> players = roomSnapshot.get('players');
+        return players
+            .map<bool>((player) =>
+                player['votingTopic'] != null && player['votingTopic'] != "")
+            .toList();
+      }
+    } catch (error) {
+      print('Error getting votingTopic status: $error');
+    }
+    return [];
+  }
+
+  static Future<void> startGame(String roomCode) async {
+    try {
+      var roomRef =
+          FirebaseFirestore.instance.collection('room_code').doc(roomCode);
+      await roomRef.update({'gameRunning': true});
+    } catch (e) {
+      print("Error starting game: $e");
     }
   }
 }

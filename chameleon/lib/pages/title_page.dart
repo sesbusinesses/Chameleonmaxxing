@@ -36,15 +36,18 @@ class TitlePage extends StatelessWidget {
                 WideButton(
                   text: 'Create Game',
                   onPressed: () async {
-                    String creatorID = DatabaseManager.generateCode(); // Generate a creator ID
-                    String roomCode = await DatabaseManager.createRoomWithCreator(creatorID); // Create room and add creator
+                    String creatorID =
+                        DatabaseManager.generateCode(); // Generate a creator ID
+                    String roomCode =
+                        await DatabaseManager.createRoomWithCreator(creatorID,
+                            "username"); // Create room and add creator
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => WaitingPage(
-                        isHost: true,
-                        roomCode: roomCode,
-                        playerId: creatorID
-                      )),
+                      MaterialPageRoute(
+                          builder: (context) => WaitingPage(
+                              isHost: true,
+                              roomCode: roomCode,
+                              playerId: creatorID)),
                     );
                   },
                 ),
@@ -64,7 +67,8 @@ class TitlePage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const TopicPage()),
+                      MaterialPageRoute(
+                          builder: (context) => const TopicPage()),
                     );
                   },
                 ),
