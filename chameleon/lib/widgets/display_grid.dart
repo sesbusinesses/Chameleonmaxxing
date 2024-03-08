@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 class DisplayGrid extends StatelessWidget {
   final List<String> userList;
-  final List<bool> hasVoted; // New list of booleans
+  final List<bool> hasVoted;
   final int crossAxisCount;
-  final Color trueColor; // Color for items with true boolean value
-  final Color falseColor; // Color for items with false boolean value
+  final Color trueColor;
+  final Color falseColor;
 
   DisplayGrid({
     super.key,
@@ -14,44 +14,41 @@ class DisplayGrid extends StatelessWidget {
     this.crossAxisCount = 2,
     this.trueColor = Colors.green,
     this.falseColor = Colors.blue,
-  }) : hasVoted = hasVoted ?? List<bool>.filled(userList.length, true); // Default to all true if not provided
+  }) : hasVoted = hasVoted ?? List<bool>.filled(userList.length, true);
 
   @override
   Widget build(BuildContext context) {
-    return Flexible(
-      child: CustomScrollView(
-        slivers: [
-          SliverPadding(
-            padding: const EdgeInsets.all(10),
-            sliver: SliverGrid(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
-                childAspectRatio: 2,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (BuildContext context, int index) {
-                  // Determine color based on the boolean value
-                  Color itemColor = hasVoted[index] ? trueColor : falseColor;
-                  return Container(
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: itemColor,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      userList[index],
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
-                    ),
-                  );
-                },
-                childCount: userList.length,
-              ),
+    return CustomScrollView(
+      slivers: [
+        SliverPadding(
+          padding: const EdgeInsets.all(10),
+          sliver: SliverGrid(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: 10,
+              mainAxisSpacing: 10,
+              childAspectRatio: 2,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                Color itemColor = hasVoted[index] ? trueColor : falseColor;
+                return Container(
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: itemColor,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    userList[index],
+                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                );
+              },
+              childCount: userList.length,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
