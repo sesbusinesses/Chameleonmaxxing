@@ -166,32 +166,72 @@ class DatabaseManager {
     return [];
   }
 
+// Fetches all topics from the 'card_topics' collection
+  static Future<List<String>> fetchTopics() async {
+    try {
+      final querySnapshot = await _db.collection('card_topics').get();
+      List<String> topics = querySnapshot.docs
+          .map((doc) => doc.id)
+          .toList(); // Assuming the document ID is the topic name
+      return topics;
+    } catch (e) {
+      print("Error fetching topics: $e");
+      return []; // Return empty list on error
+    }
+  }
+
+  // Function to start the game by selecting a chameleon and setting a random topic
   static Future<void> startGame(String roomCode) async {
     try {
       DocumentReference roomRef = _db.collection('room_code').doc(roomCode);
-
-      // Fetch the room document to get the list of players
       DocumentSnapshot roomDoc = await roomRef.get();
+
       if (roomDoc.exists && roomDoc.data() != null) {
         Map<String, dynamic> roomData = roomDoc.data() as Map<String, dynamic>;
         List<dynamic> players = roomData['players'];
-        if (players.isNotEmpty) {
-          // Select a random player to be the chameleon
-          Random rnd = Random();
-          int randomIndex = rnd.nextInt(players.length);
-          for (int i = 0; i < players.length; i++) {
-            // Reset isCham to false for all players, then set true for the selected player
-            Map<String, dynamic> player = players[i];
-            player['isCham'] = i == randomIndex;
-            players[i] = player;
-          }
 
-          // Update the room document: start the game and update players with the selected chameleon
-          await roomRef.update({
-            'gameRunning': true,
-            'players': players,
-          });
+        // Select a random player to be the chameleon
+        Random rnd = Random();
+        int randomIndex = rnd.nextInt(players.length);
+        Map<String, int> topicVotes = {};
+
+        for (int i = 0; i < players.length; i++) {
+          Map<String, dynamic> player = players[i];
+          player['isCham'] = i == randomIndex;
+          players[i] = player;
+
+          String votingTopic = player['votingTopic'] ?? '';
+          if (votingTopic.isNotEmpty) {
+            topicVotes[votingTopic] = (topicVotes[votingTopic] ?? 0) + 1;
+          }
         }
+
+        // Determine the topic for the game
+        String mostCommonTopic = '';
+        List<String> wordList = [];
+        if (topicVotes.isNotEmpty) {
+          mostCommonTopic = topicVotes.entries
+              .reduce((a, b) => a.value > b.value ? a : b)
+              .key;
+          wordList = await fetchWordListForTopic(mostCommonTopic);
+        } else {
+          // If no topic has been voted on, select one at random from the topics collection
+          List<String> topics = await fetchTopics();
+          mostCommonTopic = topics[rnd.nextInt(topics.length)];
+          wordList = await fetchWordListForTopic(mostCommonTopic);
+        }
+
+        // Select a random word from the chosen topic's word list
+        String topicWord =
+            wordList.isNotEmpty ? wordList[rnd.nextInt(wordList.length)] : "";
+
+        // Update the room document: start the game, update players with the selected chameleon, set the Topic, and topicWord
+        await roomRef.update({
+          'gameRunning': true,
+          'players': players,
+          'Topic': mostCommonTopic,
+          'topicWord': topicWord,
+        });
       }
     } catch (e) {
       print("Error starting game: $e");
@@ -242,5 +282,97 @@ class DatabaseManager {
     } catch (e) {
       print("Error updating player selection: $e");
     }
+  }
+
+  // Fetches a word list for a specific topic from the 'card_topics' collection
+  static Future<List<String>> fetchWordListForTopic(String topic) async {
+    try {
+      final docRef = _db.collection('card_topics').doc(topic);
+      final snapshot = await docRef.get();
+
+      if (snapshot.exists && snapshot.data()!.containsKey('wordList')) {
+        List<String> wordList = List<String>.from(snapshot.data()!['wordList']);
+        return wordList;
+      } else {
+        return []; // Return empty list if 'wordList' key doesn't exist or document doesn't exist
+      }
+    } catch (e) {
+      print("Error fetching word list for topic $topic: $e");
+      return []; // Return empty list on error
+    }
+  }
+
+  // Fetches the current topic for a room given its room code
+  static Future<String?> fetchRoomTopic(String roomCode) async {
+    try {
+      DocumentSnapshot roomDoc =
+          await _db.collection('room_code').doc(roomCode).get();
+
+      if (roomDoc.exists && roomDoc.data() != null) {
+        Map<String, dynamic> roomData = roomDoc.data() as Map<String, dynamic>;
+
+        // Check if the 'currentTopic' field exists and is a String
+        if (roomData.containsKey('Topic') && roomData['Topic'] is String) {
+          return roomData['Topic'];
+        }
+      }
+    } catch (e) {
+      print("Error fetching room topic for roomCode $roomCode: $e");
+    }
+    return null; // Return null if there's no topic or in case of an error
+  }
+
+  // Function to fetch the topicWord for a given room
+  static Future<String?> getTopicWord(String roomCode) async {
+    try {
+      DocumentSnapshot roomDoc =
+          await _db.collection('room_code').doc(roomCode).get();
+
+      if (roomDoc.exists && roomDoc.data() != null) {
+        Map<String, dynamic> roomData = roomDoc.data() as Map<String, dynamic>;
+
+        // Check if 'topicWord' exists in the room document and return it
+        if (roomData.containsKey('topicWord') &&
+            roomData['topicWord'] is String) {
+          return roomData['topicWord'];
+        } else {
+          // Handle case where 'topicWord' does not exist or is not a string
+          print("No topicWord found or topicWord is not a string.");
+          return null;
+        }
+      } else {
+        // Handle case where room document does not exist
+        print("Room with code $roomCode does not exist.");
+        return null;
+      }
+    } catch (e) {
+      // Handle errors such as permission issues, network errors, etc.
+      print("Error fetching topicWord for room $roomCode: $e");
+      return null;
+    }
+  }
+
+  // Method to check if a specific player is the chameleon
+  static Future<bool> isPlayerTheChameleon(
+      String roomCode, String playerId) async {
+    try {
+      DocumentSnapshot roomDoc =
+          await _db.collection('room_code').doc(roomCode).get();
+
+      if (roomDoc.exists && roomDoc.data() != null) {
+        Map<String, dynamic> roomData = roomDoc.data() as Map<String, dynamic>;
+        List<dynamic> players = roomData['players'];
+
+        for (var player in players) {
+          if (player['playerID'] == playerId) {
+            // Check if the player is marked as the chameleon
+            return player['isCham'] ?? false;
+          }
+        }
+      }
+    } catch (e) {
+      print("Error checking if player is the chameleon: $e");
+    }
+    return false; // Return false if player not found or in case of any error
   }
 }

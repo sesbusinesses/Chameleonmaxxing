@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/selectable_grid.dart';
-import '../helpers/list_fetcher.dart';
+import '../models/database_manager.dart';
 
 class WaitingTopicsPage extends StatelessWidget {
   final String playerId;
@@ -29,7 +29,7 @@ class WaitingTopicsPage extends StatelessWidget {
             Expanded(
               // Use FutureBuilder to dynamically fetch topics
               child: FutureBuilder<List<String>>(
-                future: fetchTopics(),
+                future: DatabaseManager.fetchTopics(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     if (snapshot.hasData && snapshot.data!.isNotEmpty) {
@@ -46,11 +46,11 @@ class WaitingTopicsPage extends StatelessWidget {
                       return Text('Error fetching topics: ${snapshot.error}');
                     } else {
                       // No data
-                      return Text('No topics found');
+                      return const Text('No topics found');
                     }
                   }
                   // While data is loading
-                  return CircularProgressIndicator();
+                  return const CircularProgressIndicator();
                 },
               ),
             ),

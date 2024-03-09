@@ -15,11 +15,6 @@ class GamePeoplePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-            'Game: $roomCode'), // Display room code in AppBar title for reference
-        automaticallyImplyLeading: false,
-      ),
       body: FutureBuilder<List<String>>(
         future: DatabaseManager.getPlayerUsernames(roomCode),
         builder: (context, snapshot) {

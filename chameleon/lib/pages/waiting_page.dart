@@ -25,10 +25,10 @@ class WaitingPage extends StatelessWidget {
       body: PageView(
         scrollDirection: Axis.horizontal,
         children: <Widget>[
+          WaitingTopicsPage(roomCode: roomCode, playerId: playerId),
           WaitingPeoplePage(
               isHost: isHost, roomCode: roomCode, playerId: playerId),
           // Pass roomCode and playerId to WaitingTopicsPage as well
-          WaitingTopicsPage(roomCode: roomCode, playerId: playerId),
         ],
       ),
     );

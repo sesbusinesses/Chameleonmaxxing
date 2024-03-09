@@ -70,11 +70,6 @@ class SelectableGridState extends State<SelectableGrid> {
                         setState(() {
                           _selectedItemIndex = index;
                         });
-                        DatabaseManager.updatePlayerSelection(
-                            widget.roomCode,
-                            widget.playerId,
-                            widget.updateField,
-                            widget.displayList[index]);
                       },
                 child: Container(
                   alignment: Alignment.center,
