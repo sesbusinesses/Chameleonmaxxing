@@ -80,6 +80,20 @@ class DatabaseManager {
     return [];
   }
 
+  static Stream<List<String>> streamPlayerUsernames(String roomCode) {
+    return _db.collection('room_code').doc(roomCode).snapshots().map(
+      (snapshot) {
+        if (snapshot.exists) {
+          List<dynamic> players = snapshot['players'];
+          return players.map<String>((player) => player['username'] as String).toList();
+        }
+        return [];
+      },
+    );
+  }
+
+
+
   static Future<void> setPlayerVotingCham(
       String roomCode, String playerId, String votingCham) async {
     var roomQuery = await FirebaseFirestore.instance

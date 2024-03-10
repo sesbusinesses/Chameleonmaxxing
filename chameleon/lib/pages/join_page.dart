@@ -3,7 +3,7 @@ import '../models/database_manager.dart';
 import '../widgets/wide_button.dart';
 import '../widgets/text_box.dart';
 import 'waiting_page.dart';
-import '../widgets/utility.dart'; // Assuming this contains the showMessage function
+import '../widgets/utility.dart';
 
 class JoinPage extends StatefulWidget {
   const JoinPage({super.key});
