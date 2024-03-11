@@ -17,6 +17,7 @@ class WaitingPeoplePage extends StatefulWidget {
     required this.roomCode,
     required this.playerId,
   });
+  //test
 
   @override
   State<WaitingPeoplePage> createState() => _WaitingPeoplePageState();
