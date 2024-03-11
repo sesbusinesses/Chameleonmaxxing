@@ -34,7 +34,6 @@ class _WaitingPeoplePageState extends State<WaitingPeoplePage> {
     playerNamesStream = DatabaseManager.streamPlayerUsernames(widget.roomCode);
     hasVotedStream = DatabaseManager.streamVotingStatus(widget.roomCode);
     gameRunningStream = DatabaseManager.streamGameRunning(widget.roomCode);
-    
 
     // Listen to the gameRunning stream
     gameRunningSubscription = gameRunningStream.listen((isGameRunning) {
