@@ -92,6 +92,18 @@ class DatabaseManager {
     );
   }
 
+  static Stream<List<bool>> streamVotingStatus(String roomCode) {
+    return _db.collection('room_code').doc(roomCode).snapshots().map(
+      (snapshot) {
+        if (snapshot.exists) {
+          List<dynamic> players = snapshot['players'];
+          return players.map<bool>((player) => (player['votingTopic'] != null && player['votingTopic'] != "")).toList();
+        }
+        return [];
+      },
+    );
+  }
+
 
 
   static Future<void> setPlayerVotingCham(
