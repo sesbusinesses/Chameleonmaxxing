@@ -129,6 +129,7 @@ class _WaitingPeoplePageState extends State<WaitingPeoplePage> {
                                 await DatabaseManager.removePlayerFromRoom(widget.roomCode, widget.playerId);
                               }
                               Navigator.pop(localContext);
+                              Navigator.pop(localContext);
                             } catch (e) {
                               showMessage(localContext, 'Error leaving the game. Please try again.');
                             }
