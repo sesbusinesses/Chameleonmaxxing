@@ -4,6 +4,7 @@ import '../widgets/display_grid.dart';
 import '../widgets/wide_button.dart';
 import 'game_page.dart';
 import '../widgets/utility.dart'; // Import utility for showMessage
+import 'dart:async';
 
 class WaitingPeoplePage extends StatefulWidget {
   final bool isHost;
@@ -16,6 +17,7 @@ class WaitingPeoplePage extends StatefulWidget {
     required this.roomCode,
     required this.playerId,
   });
+  //test
 
   @override
   State<WaitingPeoplePage> createState() => _WaitingPeoplePageState();
@@ -24,12 +26,38 @@ class WaitingPeoplePage extends StatefulWidget {
 class _WaitingPeoplePageState extends State<WaitingPeoplePage> {
   late Stream<List<String>> playerNamesStream;
   late Stream<List<bool>> hasVotedStream;
+  late Stream<bool> gameRunningStream;
+  late StreamSubscription<bool> gameRunningSubscription;
 
   @override
   void initState() {
     super.initState();
     playerNamesStream = DatabaseManager.streamPlayerUsernames(widget.roomCode);
     hasVotedStream = DatabaseManager.streamVotingStatus(widget.roomCode);
+    gameRunningStream = DatabaseManager.streamGameRunning(widget.roomCode);
+
+    // Listen to the gameRunning stream
+    gameRunningSubscription = gameRunningStream.listen((isGameRunning) {
+      if (isGameRunning) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => GamePage(
+              roomCode: widget.roomCode,
+              playerId: widget.playerId,
+            ),
+          ),
+        );
+      }
+    });
+  }
+
+  //idk really what this dispose does.
+  @override
+  void dispose() {
+    // Cancel the subscription when the widget is disposed
+    gameRunningSubscription.cancel();
+    super.dispose();
   }
 
   @override
