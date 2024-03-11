@@ -23,13 +23,13 @@ class WaitingPeoplePage extends StatefulWidget {
 
 class _WaitingPeoplePageState extends State<WaitingPeoplePage> {
   late Stream<List<String>> playerNamesStream;
-  late Future<List<bool>> hasVotedFuture;
+  late Stream<List<bool>> hasVotedStream;
 
   @override
   void initState() {
     super.initState();
     playerNamesStream = DatabaseManager.streamPlayerUsernames(widget.roomCode);
-    hasVotedFuture = DatabaseManager.getVotingTopicStatus(widget.roomCode);
+    hasVotedStream = DatabaseManager.streamVotingStatus(widget.roomCode);
   }
 
   @override
@@ -37,15 +37,15 @@ class _WaitingPeoplePageState extends State<WaitingPeoplePage> {
     return Scaffold(
       body: StreamBuilder<List<String>>(
         stream: playerNamesStream,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+        builder: (context, playerSnapshot) {
+          if (playerSnapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else if (snapshot.hasData) {
-            final List<String> playerNames = snapshot.data!;
-            return FutureBuilder<List<bool>>(
-              future: hasVotedFuture,
+          } else if (playerSnapshot.hasError) {
+            return Text('Error: ${playerSnapshot.error}');
+          } else if (playerSnapshot.hasData) {
+            final List<String> playerNames = playerSnapshot.data!;
+            return StreamBuilder<List<bool>>(
+              stream: hasVotedStream,
               builder: (context, hasVotedSnapshot) {
                 if (hasVotedSnapshot.connectionState == ConnectionState.waiting) {
                   return const CircularProgressIndicator();
@@ -110,7 +110,7 @@ class _WaitingPeoplePageState extends State<WaitingPeoplePage> {
                     ],
                   );
                 } else {
-                  return const Text('No voting status available');
+                  return const Text('No voting data available');
                 }
               },
             );
