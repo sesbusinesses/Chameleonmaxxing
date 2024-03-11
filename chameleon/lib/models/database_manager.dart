@@ -104,6 +104,18 @@ class DatabaseManager {
     );
   }
 
+  static Stream<bool> streamGameRunning(String roomCode) {
+    return _db.collection('room_code').doc(roomCode).snapshots().map(
+      (snapshot) {
+        if (snapshot.exists && snapshot.data() != null) {
+          Map<String, dynamic> data = snapshot.data()!;
+          return data['gameRunning'] ?? false;
+        }
+        return false;
+      },
+    );
+  }
+
 
 
   static Future<void> setPlayerVotingCham(
