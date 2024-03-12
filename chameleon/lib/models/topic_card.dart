@@ -1,60 +1,68 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class TopicCard {
   final String words;
-  final int color;
-  final String? imagePath;
+  final int? color; // Make color optional and nullable
+  final String? imagePath; // Already optional and nullable
   final List<String> wordList;
 
   TopicCard({
     required this.words, 
-    required this.color, 
+    this.color,
     this.imagePath,
     required this.wordList,
   });
 }
+final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-final List<TopicCard> topicCards = [
-  TopicCard(
-    words: 'Animals',
-    color: 0xFFCB997E,
-    imagePath: 'assets/images/animals.png',
-    wordList: ['Lion', 'Tiger', 'Bear', 'Elephant', 'Giraffe', 'Zebra', 'Fox', 'Wolf', 'Monkey', 'Deer'],
-  ),
-  TopicCard(
-    words: 'Foods',
-    color: 0xFFDDBEA9,
-    imagePath: 'assets/images/foods.png',
-    wordList: ['Pizza', 'Pasta', 'Sushi', 'Burger', 'Salad', 'Steak', 'Soup', 'Cake', 'Pie', 'Ice Cream'],
-  ),
-  TopicCard(
-    words: 'Countries',
-    color: 0xFFFFE8D6,
-    wordList: ['USA', 'UK', 'Italy', 'Brazil', 'South Korea', 'Vietnam', 'China', 'France', 'Russia', 'Nigeria'],
-  ),
-  TopicCard(
-    words: 'Jobs',
-    color: 0xFFB7B7A4,
-    imagePath: 'assets/images/jobs.png',
-    wordList: ['Homeless', 'Drag Queen', 'Engineer', 'Professor', 'Streamer', 'Yapper', 'Barista', 'CEO', 'President', 'Cook'],
-  ),
-  TopicCard(
-    words: 'People',
-    color: 0xFFA5A58D,
-    wordList: ['Ethan Dancho', 'Sherwin Wang', 'Sungmin Park', 'Joe Mama', 'Donald Trump', 'Kim Kardashian', 'Taylor Swift', 'Thomas Edison', 'MLK', 'Rosa Parks'],
-  ),
-  TopicCard(
-    words: 'Restaurants',
-    color: 0xFF6B705C,
-    wordList: ['Wendys', 'Olive Garden', 'In-N-Out', 'LeeLees', 'KFC', 'McDonalds', 'Dennys', 'IHOP', 'Jade Palace', 'Shake Shack'],
-  ),
-  TopicCard(
-    words: 'Sports',
-    color: 0xFFe9edc9,
-    wordList: ['Tennis', 'Pickelball', 'Football', 'Soccer', 'Basketball', 'Chess', 'Rugby', 'Track', 'Foozeball', 'Cricket'],
-  ),
-  TopicCard(
-    words: 'Kpop Idols',
-    color: 0xFFd6ccc2,
-    wordList: ['CHAEWON','Tzuyu', 'Jungkook', 'Jennie', 'Sakura', 'Momo', 'Sana', 'IU', 'Taehyung', 'Yuna'],
-  ),
-];
+// Assume a global accessible Firestore instance
+Future<List<TopicCard>> fetchTopicCards() async {
+  try {
+    QuerySnapshot snapshot = await _firestore.collection('card_topics').get();
+    List<TopicCard> topicCards = snapshot.docs.map((doc) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      // Check if 'wordList' exists and is not null, otherwise provide an empty list as default
+      List<String> wordList = data['wordList'] != null ? List<String>.from(data['wordList']) : [];
+      // Similarly, provide default values for color and imagePath if they are null
+      int color = data['color'] != null ? data['color'] : 0xFFFFE8D6; // Default
+      String? imagePath = data['imagePath'];
+      return TopicCard(
+        words: doc.id,
+        color: color,
+        imagePath: imagePath,
+        wordList: wordList,
+      );
+    }).toList();
+    return topicCards;
+  } catch (e) {
+    print("Error fetching topic cards: $e");
+    return [];
+  }
+}
+
+Future<void> addTopicCard(TopicCard topicCard) async {
+  try {
+    // Creating a document with a specific ID (words)
+    await _firestore.collection('card_topics').doc(topicCard.words).set({
+      'color': topicCard.color,
+      'imagePath': topicCard.imagePath,
+      'wordList': topicCard.wordList,
+    });
+    print("Topic card added successfully");
+  } catch (e) {
+    print("Error adding topic card: $e");
+  }
+}
+
+Future<void> deleteTopicCard(String topicId) async {
+  try {
+    // Deleting a document by ID
+    await _firestore.collection('card_topics').doc(topicId).delete();
+    print("Topic card deleted successfully");
+  } catch (e) {
+    print("Error deleting topic card: $e");
+  }
+}
+
+
 

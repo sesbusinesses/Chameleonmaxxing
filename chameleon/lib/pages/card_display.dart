@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:chameleon/models/topic_card.dart'; // Ensure this import matches your file structure
+import 'package:chameleon/models/topic_card.dart';
 
 class DetailPage extends StatelessWidget {
   final TopicCard topicCard;
@@ -18,11 +18,12 @@ class DetailPage extends StatelessWidget {
           child: Hero(
             tag: 'heroCard${topicCard.words}',
             child: Card(
-              color: Color(topicCard.color),
+              color: Color(topicCard.color ?? 0xFFFFE8D6),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
+                    SizedBox(height: 20),
                     Text(
                       topicCard.words,
                       style: const TextStyle(
@@ -30,6 +31,7 @@ class DetailPage extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    SizedBox(height: 20),
                     Expanded(
                       child: GridView.builder(
                         // Removed NeverScrollableScrollPhysics to allow scrolling if necessary
@@ -37,7 +39,7 @@ class DetailPage extends StatelessWidget {
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           childAspectRatio: 5,
-                          mainAxisSpacing: 50,
+                          mainAxisSpacing: 80,
                           crossAxisSpacing: 8,
                         ),
                         itemCount: topicCard.wordList.length,
