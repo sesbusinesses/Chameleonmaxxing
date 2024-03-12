@@ -116,6 +116,14 @@ class DatabaseManager {
     );
   }
 
+  static Stream<bool> streamDoesRoomExist(String roomCode) {
+  return FirebaseFirestore.instance
+      .collection('room_code')
+      .doc(roomCode)
+      .snapshots()
+      .map((snapshot) => snapshot.exists);
+  }
+
 
 
   static Future<void> setPlayerVotingCham(
