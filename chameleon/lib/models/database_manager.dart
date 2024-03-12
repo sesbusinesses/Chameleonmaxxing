@@ -8,7 +8,7 @@ class DatabaseManager {
     const String chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     Random rnd = Random();
     return String.fromCharCodes(Iterable.generate(
-        10, (_) => chars.codeUnitAt(rnd.nextInt(chars.length))));
+        5, (_) => chars.codeUnitAt(rnd.nextInt(chars.length))));
   }
 
   static Future<String> createRoomWithCreator(
