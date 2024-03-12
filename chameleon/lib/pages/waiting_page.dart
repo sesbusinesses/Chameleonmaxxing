@@ -3,6 +3,7 @@ import 'game_page.dart';
 import '../models/database_manager.dart';
 import 'waiting_people_page.dart';
 import 'waiting_topics_page.dart';
+import '../widgets/utility.dart';
 import 'dart:async';
 
 class WaitingPage extends StatefulWidget {
@@ -24,11 +25,14 @@ class WaitingPage extends StatefulWidget {
 class _WaitingPageState extends State<WaitingPage> {
   late Stream<bool> gameRunningStream;
   late StreamSubscription<bool> gameRunningSubscription;
+  late Stream<bool> doesRoomExistStream;
+  late StreamSubscription<bool> doesRoomExistSubscription;
 
   @override
   void initState() {
     super.initState();
     gameRunningStream = DatabaseManager.streamGameRunning(widget.roomCode);
+    doesRoomExistStream = DatabaseManager.streamDoesRoomExist(widget.roomCode);
 
     gameRunningSubscription = gameRunningStream.listen((isGameRunning) {
       if (isGameRunning) {
@@ -43,11 +47,25 @@ class _WaitingPageState extends State<WaitingPage> {
         );
       }
     });
+
+    
+    doesRoomExistSubscription = doesRoomExistStream.listen((doesGameExist) {
+      if (!doesGameExist) {
+        Navigator.popUntil(context, (route) => route.isFirst);
+        if(widget.isHost){
+          showMessageWarning(context, 'You successfully deleted the room.');
+        }
+        else{
+          showMessageWarning(context, 'The room no longer exists.');
+        }
+      }
+    });
   }
 
   @override
   void dispose() {
     gameRunningSubscription.cancel();
+    doesRoomExistSubscription.cancel();
     super.dispose();
   }
 
