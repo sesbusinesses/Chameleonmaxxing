@@ -421,4 +421,27 @@ class DatabaseManager {
     }
     return false; // Return false if player not found or in case of any error
   }
+
+  // Method to count number of players in the game room
+  static Future<int> countPlayersInRoom(String roomCode) async {
+    DocumentSnapshot roomSnapshot =
+        await _db.collection('room_code').doc(roomCode).get();
+    if (roomSnapshot.exists) {
+      List<dynamic> players = roomSnapshot['players'];
+      return players.length;
+    }
+    return 0;
+  }
+
+  // Method to count number of players in the game room with votingCham not null
+  static Future<int> countPlayersVotingChamNotNull(String roomCode) async {
+    DocumentSnapshot roomSnapshot = await _db.collection('room_code').doc(roomCode).get();
+    if (roomSnapshot.exists) {
+      List<dynamic> players = roomSnapshot.get('players');
+      int count = players.where((player) => player['votingCham'] != null).length;
+      return count;
+    }
+    return 0;
+  }
+
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/database_manager.dart';
-import 'wide_button.dart'; // Adjust the import path as necessary
+import '../widgets/wide_button.dart'; // Adjust the import path as necessary
+import '../pages/reveal_page.dart'; // Ensure this import is correct
 
 class SelectableGrid extends StatefulWidget {
   final List<String> displayList;
@@ -41,9 +42,21 @@ class SelectableGridState extends State<SelectableGrid> {
         widget.displayList.contains(initialSelection)) {
       setState(() {
         _selectedItemIndex = widget.displayList.indexOf(initialSelection);
-        _isSelectionConfirmed =
-            true; // Confirm selection if there's an initial one
+        _isSelectionConfirmed = true; // Confirm selection if there's an initial one
       });
+    }
+  }
+
+  Future<void> _tryToNavigateToRevealPage(BuildContext context) async {
+    // Navigate to the RevealPage
+    int votingChamTrueCount = await DatabaseManager.countPlayersVotingChamNotNull(widget.roomCode);
+    int playersInRoomCount = await DatabaseManager.countPlayersInRoom(widget.roomCode);
+    
+    // Only navigate to Reveal page if updateField is 'votingCham' and if everyone voted.
+    //TO-DO : right now it just navigate to reveal page even if not everyone has voted.
+    if (widget.updateField == 'votingCham' &&
+        votingChamTrueCount >= playersInRoomCount) {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => RevealPage(roomCode : widget.roomCode, playerId : widget.playerId)));
     }
   }
 
@@ -76,9 +89,7 @@ class SelectableGridState extends State<SelectableGrid> {
                   decoration: BoxDecoration(
                     color: isSelected ? Colors.red : widget.color,
                     borderRadius: BorderRadius.circular(10),
-                    border: isSelected
-                        ? Border.all(color: Colors.white, width: 2)
-                        : null,
+                    border: isSelected ? Border.all(color: Colors.white, width: 2) : null,
                   ),
                   child: Text(
                     widget.displayList[index],
@@ -99,10 +110,10 @@ class SelectableGridState extends State<SelectableGrid> {
                   setState(() {
                     _isSelectionConfirmed = true;
                   });
-                  final selectedOption =
-                      widget.displayList[_selectedItemIndex!];
-                  DatabaseManager.updatePlayerSelection(widget.roomCode,
-                      widget.playerId, widget.updateField, selectedOption);
+                  final selectedOption = widget.displayList[_selectedItemIndex!];
+                  DatabaseManager.updatePlayerSelection(widget.roomCode, widget.playerId, widget.updateField, selectedOption).then((_) {
+                    _tryToNavigateToRevealPage(context);
+                  });
                 }
               },
             ),
