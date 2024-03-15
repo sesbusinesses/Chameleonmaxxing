@@ -47,19 +47,6 @@ class SelectableGridState extends State<SelectableGrid> {
     }
   }
 
-  Future<void> _tryToNavigateToRevealPage(BuildContext context) async {
-    // Navigate to the RevealPage
-    int votingChamTrueCount = await DatabaseManager.countPlayersVotingChamNotNull(widget.roomCode);
-    int playersInRoomCount = await DatabaseManager.countPlayersInRoom(widget.roomCode);
-    
-    // Only navigate to Reveal page if updateField is 'votingCham' and if everyone voted.
-    //TO-DO : right now it just navigate to reveal page even if not everyone has voted.
-    if (widget.updateField == 'votingCham' &&
-        votingChamTrueCount >= playersInRoomCount) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => RevealPage(roomCode : widget.roomCode, playerId : widget.playerId)));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -112,7 +99,9 @@ class SelectableGridState extends State<SelectableGrid> {
                   });
                   final selectedOption = widget.displayList[_selectedItemIndex!];
                   DatabaseManager.updatePlayerSelection(widget.roomCode, widget.playerId, widget.updateField, selectedOption).then((_) {
-                    _tryToNavigateToRevealPage(context);
+                    if (widget.updateField == 'votingCham') {
+                      DatabaseManager.updateVoteNum(widget.roomCode);
+                    }
                   });
                 }
               },

@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:async';
 
 class DatabaseManager {
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -116,13 +117,6 @@ class DatabaseManager {
     );
   }
 
-  static Stream<bool> streamDoesRoomExist(String roomCode) {
-  return FirebaseFirestore.instance
-      .collection('room_code')
-      .doc(roomCode)
-      .snapshots()
-      .map((snapshot) => snapshot.exists);
-  }
 
 
 
@@ -277,6 +271,7 @@ class DatabaseManager {
           'players': players,
           'Topic': mostCommonTopic,
           'topicWord': topicWord,
+          'voteNum' : 0,
         });
       }
     } catch (e) {
@@ -421,6 +416,14 @@ class DatabaseManager {
     }
     return false; // Return false if player not found or in case of any error
   }
+  
+  static Stream<bool> streamDoesRoomExist(String roomCode) {
+  return FirebaseFirestore.instance
+      .collection('room_code')
+      .doc(roomCode)
+      .snapshots()
+      .map((snapshot) => snapshot.exists);
+  }
 
   // Method to count number of players in the game room
   static Future<int> countPlayersInRoom(String roomCode) async {
@@ -433,15 +436,55 @@ class DatabaseManager {
     return 0;
   }
 
-  // Method to count number of players in the game room with votingCham not null
-  static Future<int> countPlayersVotingChamNotNull(String roomCode) async {
-    DocumentSnapshot roomSnapshot = await _db.collection('room_code').doc(roomCode).get();
-    if (roomSnapshot.exists) {
-      List<dynamic> players = roomSnapshot.get('players');
-      int count = players.where((player) => player['votingCham'] != null).length;
-      return count;
-    }
-    return 0;
+  static Stream<bool> getVoteNumStream(String roomCode) {
+  StreamController<bool> controller = StreamController<bool>();
+  
+  // This variable will hold the latest player count.
+  int? latestPlayerCount;
+
+  // Start listening to the player count updates.
+  // You may want to handle this more robustly in a real app, e.g., refreshing periodically.
+  countPlayersInRoom(roomCode).then((count) {
+    latestPlayerCount = count;
+  }).catchError((_) {
+    latestPlayerCount = 0; // Handle error or maintain old count
+  });
+
+  // Subscribe to voteNum changes from Firestore.
+  FirebaseFirestore.instance
+    .collection('room_code')
+    .doc(roomCode)
+    .snapshots()
+    .listen((snapshot) {
+      final voteNum = snapshot.data()?['voteNum'] as int? ?? 0;
+      
+      // Check if we have a latest player count and compare.
+      if (latestPlayerCount != null) {
+        controller.add(voteNum > latestPlayerCount!-1);
+      }
+    }).onError((_) {
+      controller.add(false); // Handle stream errors or complete the stream
+    });
+
+  return controller.stream;
+}
+
+
+  // Setter method for voteNum
+  static Future<void> updateVoteNum(String roomCode) async {
+    DocumentReference roomRef = _db.collection('room_code').doc(roomCode);
+
+    FirebaseFirestore.instance.runTransaction((transaction) async {
+      DocumentSnapshot snapshot = await transaction.get(roomRef);
+
+      if (!snapshot.exists) {
+        throw Exception("Room does not exist!");
+      }
+
+      int currentVoteNum = snapshot['voteNum'] ?? 0; // Get the current number of votes, defaulting to 0 if none
+      transaction.update(roomRef, {'voteNum': currentVoteNum + 1}); // Increment the vote number by 1
+    });
   }
 
+  
 }
