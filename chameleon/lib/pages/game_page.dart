@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import '../models/database_manager.dart';
 import 'game_topic_page.dart';
 import 'game_people_page.dart';
+import 'reveal_page.dart';
 
-class GamePage extends StatelessWidget {
-  final String roomCode; // Example data that might be passed to child pages
+class GamePage extends StatefulWidget {
+  final String roomCode;
   final String playerId;
 
   const GamePage({
@@ -13,22 +16,50 @@ class GamePage extends StatelessWidget {
   });
 
   @override
+  State<GamePage> createState() => _GamePageState();
+}
+
+class _GamePageState extends State<GamePage> {
+  late Stream<bool> voteNumStream;
+  late StreamSubscription<bool> voteNumSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    voteNumStream = DatabaseManager.getVoteNumStream(widget.roomCode);
+
+    voteNumSubscription = voteNumStream.listen((voteNum) {
+      //int countPlayersInRoom = await DatabaseManager.countPlayersInRoom(widget.roomCode); // Retrieve the player count asynchronously
+      if (voteNum) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RevealPage(roomCode: widget.roomCode, playerId: widget.playerId),
+          ),
+        );
+      }
+    });
+  }
+
+
+  @override
+  void dispose() {
+    voteNumSubscription.cancel(); // Corrected to the proper subscription variable
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Game Page'),
-        automaticallyImplyLeading: false, // Consider navigation implications
+        automaticallyImplyLeading: false,
       ),
       body: PageView(
         scrollDirection: Axis.horizontal,
         children: <Widget>[
-          GameTopicPage(
-            roomCode: roomCode,
-            playerId: playerId,
-          ), // Hypothetically passing roomCode
-          GamePeoplePage(
-              playerId: playerId,
-              roomCode: roomCode), // Passing both roomId and playerId
+          GameTopicPage(roomCode: widget.roomCode, playerId: widget.playerId), // Use 'widget.' to access widget properties
+          GamePeoplePage(playerId: widget.playerId, roomCode: widget.roomCode),
         ],
       ),
     );
