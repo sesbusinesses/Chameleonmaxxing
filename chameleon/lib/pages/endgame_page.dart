@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/database_manager.dart';
+import '../widgets/display_grid.dart';
 import '../widgets/wide_button.dart';
 import 'title_page.dart'; // Assume this is your app's title or home page
 
@@ -8,10 +9,10 @@ class EndGamePage extends StatefulWidget {
   final String playerId;
 
   const EndGamePage({
-    Key? key,
+    super.key,
     required this.roomCode,
     required this.playerId,
-  }) : super(key: key);
+  });
 
   @override
   _EndGamePageState createState() => _EndGamePageState();
@@ -22,6 +23,8 @@ class _EndGamePageState extends State<EndGamePage> {
   late Future<int> playerScore;
   late Future<bool> isPlayerHost;
   late Future<String?> chameleonUsername;
+  late Stream<List<String>> playerNamesStream;
+  late Stream<List<bool>> playAgainStream;
 
   @override
   void initState() {
@@ -31,6 +34,8 @@ class _EndGamePageState extends State<EndGamePage> {
         DatabaseManager.getPlayerScore(widget.roomCode, widget.playerId);
     isPlayerHost = DatabaseManager.isHost(widget.roomCode, widget.playerId);
     chameleonUsername = DatabaseManager.getChameleonUsername(widget.roomCode);
+    playerNamesStream = DatabaseManager.streamPlayerUsernames(widget.roomCode);
+    playAgainStream = DatabaseManager.streamPlayAgainStatus(widget.roomCode);
   }
 
   @override
@@ -83,7 +88,38 @@ class _EndGamePageState extends State<EndGamePage> {
                 }
               },
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
+            StreamBuilder<List<String>>(
+              stream: playerNamesStream,
+              builder: (context, playerSnapshot) {
+                if (playerSnapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                }
+                if (!playerSnapshot.hasData) {
+                  return const Text('No player data available');
+                }
+                // Ensure there's a corresponding StreamBuilder for playAgainStream
+                return StreamBuilder<List<bool>>(
+                  stream: playAgainStream,
+                  builder: (context, playAgainSnapshot) {
+                    if (playAgainSnapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    }
+                    if (!playAgainSnapshot.hasData) {
+                      return const Text('Waiting for players\' decisions...');
+                    }
+                    // Assuming DisplayGrid can handle empty or null lists properly
+                    return Expanded(
+                        child: DisplayGrid(
+                      userList: playerSnapshot.data!,
+                      hasVoted: playAgainSnapshot
+                          .data!, // Assuming hasVoted is analogous to wantsToPlayAgain
+                    ));
+                  },
+                );
+              },
+            ),
           ],
         ),
       ),
@@ -97,7 +133,7 @@ class _EndGamePageState extends State<EndGamePage> {
               text: 'Play Again',
               color: Colors.green,
               onPressed: () {
-                // Implementation for playing again
+                DatabaseManager.votePlayAgain(widget.roomCode, widget.playerId);
               },
             ),
             const SizedBox(height: 15),
@@ -117,7 +153,7 @@ class _EndGamePageState extends State<EndGamePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          TitlePage()), // Assuming TitlePage is your app's entry page
+                          const TitlePage()), // Assuming TitlePage is your app's entry page
                   (Route<dynamic> route) => false,
                 );
               },

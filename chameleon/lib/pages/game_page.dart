@@ -28,15 +28,20 @@ class _GamePageState extends State<GamePage> {
     voteNumStream = DatabaseManager.getVoteNumStream(widget.roomCode);
 
     // Listen for changes in the voteNum to determine when to navigate to the EndGamePage.
-    voteNumSubscription = voteNumStream.listen((voteNum) {
+    voteNumSubscription = voteNumStream.listen((voteNum) async {
+      // Make this callback async
       if (voteNum) {
-        DatabaseManager.endGame(widget.roomCode);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => EndGamePage(
-                  roomCode: widget.roomCode, playerId: widget.playerId)),
-        );
+        await DatabaseManager.endGame(
+            widget.roomCode); // Wait for endGame to complete
+        if (mounted) {
+          // Check if the widget is still in the widget tree
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => EndGamePage(
+                    roomCode: widget.roomCode, playerId: widget.playerId)),
+          );
+        }
       }
     });
 

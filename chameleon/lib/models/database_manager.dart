@@ -116,6 +116,21 @@ class DatabaseManager {
     );
   }
 
+  static Stream<List<bool>> streamPlayAgainStatus(String roomCode) {
+    return _db.collection('room_code').doc(roomCode).snapshots().map(
+      (snapshot) {
+        if (snapshot.exists) {
+          List<dynamic> players = snapshot['players'];
+          return players
+              .map<bool>((player) =>
+                  (player['playAgain'] != null && player['playAgain'] == true))
+              .toList();
+        }
+        return [];
+      },
+    );
+  }
+
   static Stream<bool> streamGameRunning(String roomCode) {
     return _db.collection('room_code').doc(roomCode).snapshots().map(
       (snapshot) {
@@ -613,11 +628,6 @@ class DatabaseManager {
       chameleon = players.firstWhere((player) => player['isCham'] == true,
           orElse: () => null);
 
-      if (chameleon == null) {
-        print("No chameleon found.");
-        return;
-      }
-
       chameleonGuessedWord = chameleon['chamGuess'] == topicWord;
 
       // Iterate over players to update scores
@@ -698,5 +708,35 @@ class DatabaseManager {
       print("Error retrieving player score: $e");
     }
     return 0; // Return 0 if the player is not found, or in case of any error
+  }
+
+  // Function to set 'playAgain' = true for a provided player
+  static Future<void> votePlayAgain(String roomCode, String playerId) async {
+    try {
+      // Reference to the specific room
+      DocumentReference roomRef = _db.collection('room_code').doc(roomCode);
+      DocumentSnapshot roomSnapshot = await roomRef.get();
+
+      if (roomSnapshot.exists && roomSnapshot.data() != null) {
+        List<dynamic> players = List.from(roomSnapshot['players']);
+        List<Map<String, dynamic>> updatedPlayers = [];
+
+        // Iterate through all players to find the matching playerId
+        for (var player in players) {
+          Map<String, dynamic> updatedPlayer =
+              Map<String, dynamic>.from(player);
+          if (player['playerID'] == playerId) {
+            // Set 'playAgain' to true for the matched player
+            updatedPlayer['playAgain'] = true;
+          }
+          updatedPlayers.add(updatedPlayer);
+        }
+
+        // Update the room document with the modified players array
+        await roomRef.update({'players': updatedPlayers});
+      }
+    } catch (e) {
+      print("Error setting votePlayAgain: $e");
+    }
   }
 }
