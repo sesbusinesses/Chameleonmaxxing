@@ -26,6 +26,9 @@ class DatabaseManager {
           'username': username,
           'votingCham': "",
           'votingTopic': "",
+          'score': 0, // Initialize the score to 0 for the creator
+          'playAgain': false,
+          'isHost': true,
         }
       ]
     });
@@ -40,6 +43,9 @@ class DatabaseManager {
       'username': username,
       'votingCham': "",
       'votingTopic': "",
+      'score': 0, // Assign a starting score of zero for the new player
+      'playAgain': false,
+      'isHost': false,
     };
 
     DocumentReference roomRef = _db.collection('room_code').doc(roomCode);
@@ -104,6 +110,21 @@ class DatabaseManager {
           return players
               .map<bool>((player) => (player['votingTopic'] != null &&
                   player['votingTopic'] != ""))
+              .toList();
+        }
+        return [];
+      },
+    );
+  }
+
+  static Stream<List<bool>> streamPlayAgainStatus(String roomCode) {
+    return _db.collection('room_code').doc(roomCode).snapshots().map(
+      (snapshot) {
+        if (snapshot.exists) {
+          List<dynamic> players = snapshot['players'];
+          return players
+              .map<bool>((player) =>
+                  (player['playAgain'] != null && player['playAgain'] == true))
               .toList();
         }
         return [];
@@ -247,6 +268,11 @@ class DatabaseManager {
           if (votingTopic.isNotEmpty) {
             topicVotes[votingTopic] = (topicVotes[votingTopic] ?? 0) + 1;
           }
+        }
+
+        for (int i = 0; i < players.length; i++) {
+          players[i]['playAgain'] =
+              false; // Reset 'playAgain' to false for all players
         }
 
         // Determine the topic for the game
@@ -525,23 +551,24 @@ class DatabaseManager {
       if (roomDoc.exists && roomDoc.data() != null) {
         Map<String, dynamic> roomData = roomDoc.data() as Map<String, dynamic>;
         List<dynamic> players = roomData['players'];
-        String? chameleonId;
+        String? chameleonUsername;
 
         // Identify the chameleon's playerID
         for (var player in players) {
           if (player['isCham'] == true) {
-            chameleonId = player['playerID'];
+            chameleonUsername = player['username'];
             break;
           }
         }
 
-        if (chameleonId == null)
+        if (chameleonUsername == null) {
           return false; // No chameleon found, or error in data structure
+        }
 
         // Count votes for each player
         Map<String, int> voteCounts = {};
         for (var player in players) {
-          String votedFor = player['votedFor'] ?? '';
+          String votedFor = player['votingCham'] ?? '';
           if (votedFor.isNotEmpty) {
             voteCounts[votedFor] = (voteCounts[votedFor] ?? 0) + 1;
           }
@@ -551,7 +578,7 @@ class DatabaseManager {
         String? mostVotedFor = voteCounts.entries
             .reduce((curr, next) => curr.value > next.value ? curr : next)
             .key;
-        return chameleonId == mostVotedFor;
+        return chameleonUsername == mostVotedFor;
       }
     } catch (e) {
       print("Error checking if chameleon was caught: $e");
@@ -582,9 +609,135 @@ class DatabaseManager {
     return null; // Return null if chameleon's username couldn't be found or on error
   }
 
-  static Future<String> loadUsername() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString('username') ?? 'Default Username'; // Use a default value or leave empty
+  static Future<void> endGame(String roomCode) async {
+    try {
+      DocumentReference roomRef = _db.collection('room_code').doc(roomCode);
+      DocumentSnapshot roomSnapshot = await roomRef.get();
+
+      if (!roomSnapshot.exists || roomSnapshot.data() == null) {
+        print("Room does not exist.");
+        return;
+      }
+
+      List<dynamic> players = List.from(roomSnapshot['players']);
+      String? topicWord = roomSnapshot['topicWord'];
+      Map<String, dynamic> chameleon;
+      List<Map<String, dynamic>> updatedPlayers = [];
+      bool chameleonGuessedWord = false;
+
+      // First, identify the chameleon
+      chameleon = players.firstWhere((player) => player['isCham'] == true,
+          orElse: () => null);
+
+      chameleonGuessedWord = chameleon['chamGuess'] == topicWord;
+
+      // Iterate over players to update scores
+      for (var player in players) {
+        Map<String, dynamic> updatedPlayer = Map<String, dynamic>.from(player);
+        if (player['playerID'] != chameleon['playerID'] &&
+            player['votingCham'] == chameleon['username']) {
+          // Increment score for correct guesses
+          updatedPlayer['score'] = (player['score'] ?? 0) + 1;
+        }
+        if (player['playerID'] == chameleon['playerID'] &&
+            chameleonGuessedWord) {
+          updatedPlayer['score'] = (player['score'] ?? 0) + 2;
+        }
+        updatedPlayers.add(updatedPlayer);
+      }
+
+      // Use a transaction to atomically update the players' scores and reset game state
+      await _db.runTransaction((transaction) async {
+        transaction.update(roomRef, {
+          'players': updatedPlayers,
+          'gameRunning': false,
+          'voteNum': 0, // Reset vote count or any other game state as needed
+        });
+      });
+    } catch (e) {
+      print("Error ending game: $e");
+    }
   }
 
+  static Future<bool> isHost(String roomCode, String playerId) async {
+    try {
+      DocumentSnapshot roomDoc =
+          await _db.collection('room_code').doc(roomCode).get();
+
+      if (roomDoc.exists && roomDoc.data() != null) {
+        Map<String, dynamic> roomData = roomDoc.data() as Map<String, dynamic>;
+        List<dynamic> players = roomData['players'];
+
+        // Look for the player with the given playerId
+        var player = players.firstWhere(
+          (player) => player['playerID'] == playerId,
+          orElse: () => null,
+        );
+
+        // Check if the player is marked as the host
+        if (player != null) {
+          return player['isHost'] ?? false;
+        }
+      }
+    } catch (e) {
+      print("Error checking if player is the host: $e");
+    }
+    return false; // Return false if the player is not found, or in case of any error
+  }
+
+  static Future<int> getPlayerScore(String roomCode, String playerId) async {
+    try {
+      DocumentSnapshot roomDoc =
+          await _db.collection('room_code').doc(roomCode).get();
+
+      if (roomDoc.exists && roomDoc.data() != null) {
+        Map<String, dynamic> roomData = roomDoc.data() as Map<String, dynamic>;
+        List<dynamic> players = roomData['players'];
+
+        // Look for the player with the given playerId
+        var player = players.firstWhere(
+          (player) => player['playerID'] == playerId,
+          orElse: () => null,
+        );
+
+        // Return the player's score if found
+        if (player != null) {
+          return player['score'] ?? 0; // Default to 0 if 'score' is not set
+        }
+      }
+    } catch (e) {
+      print("Error retrieving player score: $e");
+    }
+    return 0; // Return 0 if the player is not found, or in case of any error
+  }
+
+  // Function to set 'playAgain' = true for a provided player
+  static Future<void> votePlayAgain(String roomCode, String playerId) async {
+    try {
+      // Reference to the specific room
+      DocumentReference roomRef = _db.collection('room_code').doc(roomCode);
+      DocumentSnapshot roomSnapshot = await roomRef.get();
+
+      if (roomSnapshot.exists && roomSnapshot.data() != null) {
+        List<dynamic> players = List.from(roomSnapshot['players']);
+        List<Map<String, dynamic>> updatedPlayers = [];
+
+        // Iterate through all players to find the matching playerId
+        for (var player in players) {
+          Map<String, dynamic> updatedPlayer =
+              Map<String, dynamic>.from(player);
+          if (player['playerID'] == playerId) {
+            // Set 'playAgain' to true for the matched player
+            updatedPlayer['playAgain'] = true;
+          }
+          updatedPlayers.add(updatedPlayer);
+        }
+
+        // Update the room document with the modified players array
+        await roomRef.update({'players': updatedPlayers});
+      }
+    } catch (e) {
+      print("Error setting votePlayAgain: $e");
+    }
+  }
 }
