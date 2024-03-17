@@ -14,8 +14,6 @@ class ChamGuessPage extends StatefulWidget {
 }
 
 class _ChamGuessPageState extends State<ChamGuessPage> {
-  String? _selectedWord;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
