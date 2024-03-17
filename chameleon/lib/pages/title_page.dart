@@ -48,7 +48,7 @@ class TitlePage extends StatelessWidget {
                 WideButton(
                   text: 'Create Game',
                   onPressed: () async {
-                    String creatorID = await DatabaseManager
+                    String creatorID = DatabaseManager
                         .generateCode(); // Generate a creator ID
                     String username = await DatabaseManager.loadUsername();
                     String roomCode =
