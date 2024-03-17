@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import '../models/database_manager.dart';
+import 'end_game_page.dart';
 import 'game_topic_page.dart';
 import 'game_people_page.dart';
-import 'endgame_page.dart';
 import 'cham_guess_page.dart'; // Import the ChamGuessPage
 
 class GamePage extends StatefulWidget {

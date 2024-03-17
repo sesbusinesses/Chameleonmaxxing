@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'player_score.dart';
+
 class DatabaseManager {
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
 
@@ -745,5 +747,31 @@ class DatabaseManager {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString('username') ??
         'Default Username'; // Use a default value or leave empty
+  }
+
+  static Future<List<PlayerScore>> getLeaderboardScores(String roomCode) async {
+    try {
+      // Adjusted to query a subcollection 'players' within a specific room document
+      QuerySnapshot querySnapshot = await _db
+          .collection('rooms')
+          .doc(roomCode)
+          .collection('players')
+          .orderBy('score',
+              descending:
+                  true) // Assuming 'score' is a field within each player document
+          .get();
+
+      List<PlayerScore> scores = querySnapshot.docs.map((doc) {
+        return PlayerScore(
+          playerName: doc['username'], // Adjust field name as per your database
+          score: doc['score'], // Adjust field name as per your database
+        );
+      }).toList();
+
+      return scores;
+    } catch (e) {
+      print("Error fetching leaderboard scores for room $roomCode: $e");
+      return []; // Return an empty list in case of error
+    }
   }
 }
