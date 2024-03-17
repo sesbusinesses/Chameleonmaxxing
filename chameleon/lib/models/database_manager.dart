@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DatabaseManager {
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -580,4 +581,10 @@ class DatabaseManager {
     }
     return null; // Return null if chameleon's username couldn't be found or on error
   }
+
+  static Future<String> loadUsername() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('username') ?? 'Default Username'; // Use a default value or leave empty
+  }
+
 }

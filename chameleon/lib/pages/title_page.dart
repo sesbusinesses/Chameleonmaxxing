@@ -6,6 +6,7 @@ import 'join_page.dart';
 import 'waiting_page.dart';
 import 'profile_page.dart';
 
+
 class TitlePage extends StatelessWidget {
   const TitlePage({super.key});
 
@@ -49,10 +50,11 @@ class TitlePage extends StatelessWidget {
                   text: 'Create Game',
                   onPressed: () async {
                     String creatorID =
-                        DatabaseManager.generateCode(); // Generate a creator ID
+                        await DatabaseManager.generateCode(); // Generate a creator ID
+                    String username = await DatabaseManager.loadUsername();
                     String roomCode =
                         await DatabaseManager.createRoomWithCreator(creatorID,
-                            "username"); // Create room and add creator
+                            username); // Create room and add creator
                     Navigator.push(
                       context,
                       MaterialPageRoute(
