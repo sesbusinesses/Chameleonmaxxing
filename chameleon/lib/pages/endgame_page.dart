@@ -75,6 +75,9 @@ class _EndGamePageState extends State<EndGamePage> {
                 text: 'Exit',
                 color: Colors.red,
                 onPressed: () {
+                  //t0-do : right now room just get destroyed if one person leaves.
+                  DatabaseManager.removeEntireRoom(widget.roomCode);
+                  
                   // Pop until reaching the first route on the stack, which is the title page
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },
