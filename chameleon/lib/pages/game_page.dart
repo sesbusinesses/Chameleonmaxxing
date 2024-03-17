@@ -34,7 +34,8 @@ class _GamePageState extends State<GamePage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) => EndGamePage(roomCode: widget.roomCode)),
+              builder: (context) => EndGamePage(
+                  roomCode: widget.roomCode, playerId: widget.playerId)),
         );
       }
     });
