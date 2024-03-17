@@ -7,13 +7,16 @@ class TopicPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
-      body: SafeArea( // SafeArea should wrap the content you want to ensure is within the safe boundaries
+      body: SafeArea(
+        // SafeArea should wrap the content you want to ensure is within the safe boundaries
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children:[
+            children: [
               // Your CardList widget here. Assuming it's a widget that can be directly used.
-              Expanded(child: CardList()), // If CardList is scrollable, wrapping it in Expanded is usually a good idea
+              Expanded(
+                  child:
+                      CardList()), // If CardList is scrollable, wrapping it in Expanded is usually a good idea
             ],
           ),
         ),

@@ -36,7 +36,8 @@ class DetailPage extends StatelessWidget {
                       child: GridView.builder(
                         // Removed NeverScrollableScrollPhysics to allow scrolling if necessary
                         shrinkWrap: true,
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                           childAspectRatio: 5,
                           mainAxisSpacing: 80,

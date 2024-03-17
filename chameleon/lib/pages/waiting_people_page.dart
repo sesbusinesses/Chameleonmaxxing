@@ -89,7 +89,7 @@ class _WaitingPeoplePageState extends State<WaitingPeoplePage> {
                         } else {
                           await DatabaseManager.removePlayerFromRoom(
                               widget.roomCode, widget.playerId);
-                              Navigator.popUntil(context, (route) => route.isFirst);
+                          Navigator.popUntil(context, (route) => route.isFirst);
                         }
                       },
                     ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../widgets/text_box.dart';  // Adjust the path as per your project structure
-import '../widgets/wide_button.dart';  // Adjust the path as per your project structure
-import 'how_to_page.dart';
+import '../widgets/text_box.dart'; // Adjust the path as per your project structure
+import '../widgets/wide_button.dart'; // Adjust the path as per your project structure
+import 'how_to_page.dart'; // Assume this is your app's How-To Guide page
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -26,9 +26,10 @@ class _ProfilePageState extends State<ProfilePage> {
     _usernameController.text = username;
   }
 
-  Future<void> _saveUsername(String username) async {
+  Future<void> _saveUsernameAndExit() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('username', username);
+    await prefs.setString('username', _usernameController.text);
+    Navigator.pop(context); // Pop the navigation context once
   }
 
   @override
@@ -36,41 +37,30 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
+        automaticallyImplyLeading: false, // Removes the back button
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            const Text(
-              'Edit Profile',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 20),
-            TextBox(
-              hintText: 'Username',
-              controller: _usernameController,
-              onSubmitted: (newValue) {
-                _saveUsername(newValue);
-              },
-            ),
-            const SizedBox(height: 20),
-            WideButton(
-              text: 'Save Username',
-              onPressed: () {
-                _saveUsername(_usernameController.text);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Username saved successfully!'),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Edit Username',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
-                );
-              },
+                ),
+                TextBox(
+                  hintText: 'Username',
+                  controller: _usernameController,
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
             WideButton(
-              text: 'How To Guide',
+              text: 'How To Play',
               onPressed: () {
                 Navigator.push(
                   context,
@@ -78,8 +68,15 @@ class _ProfilePageState extends State<ProfilePage> {
                 );
               },
             ),
-            // Add more widgets as needed
           ],
+        ),
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(bottom: 40.0),
+        child: WideButton(
+          text: 'Save and Exit',
+          color: Colors.red,
+          onPressed: _saveUsernameAndExit,
         ),
       ),
     );

@@ -19,7 +19,8 @@ class WideButton extends StatelessWidget {
       child: Material(
         borderRadius: BorderRadius.circular(12),
         elevation: 4, // Set elevation to give the button a raised look
-        color: color, // The color is now directly applied to the Material widget
+        color:
+            color, // The color is now directly applied to the Material widget
         child: InkWell(
           onTap: onPressed,
           borderRadius: BorderRadius.circular(12),
@@ -28,7 +29,8 @@ class WideButton extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              color: Colors.transparent, // Ensure Container's color doesn't override Material's color
+              color: Colors
+                  .transparent, // Ensure Container's color doesn't override Material's color
             ),
             child: Center(
               child: Text(

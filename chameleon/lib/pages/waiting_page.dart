@@ -48,14 +48,12 @@ class _WaitingPageState extends State<WaitingPage> {
       }
     });
 
-    
     doesRoomExistSubscription = doesRoomExistStream.listen((doesGameExist) {
       if (!doesGameExist) {
         Navigator.popUntil(context, (route) => route.isFirst);
-        if(widget.isHost){
+        if (widget.isHost) {
           showMessageWarning(context, 'You successfully deleted the room.');
-        }
-        else{
+        } else {
           showMessageWarning(context, 'The room no longer exists.');
         }
       }
@@ -73,14 +71,19 @@ class _WaitingPageState extends State<WaitingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Join Code: ${widget.roomCode}'), // Display roomCode in AppBar title
+        title: Text(
+            'Join Code: ${widget.roomCode}'), // Display roomCode in AppBar title
         automaticallyImplyLeading: false, // Removes the back arrow
       ),
       body: PageView(
         scrollDirection: Axis.horizontal,
         children: <Widget>[
-          WaitingTopicsPage(roomCode: widget.roomCode, playerId: widget.playerId),
-          WaitingPeoplePage(isHost: widget.isHost, roomCode: widget.roomCode, playerId: widget.playerId),
+          WaitingTopicsPage(
+              roomCode: widget.roomCode, playerId: widget.playerId),
+          WaitingPeoplePage(
+              isHost: widget.isHost,
+              roomCode: widget.roomCode,
+              playerId: widget.playerId),
         ],
       ),
     );
