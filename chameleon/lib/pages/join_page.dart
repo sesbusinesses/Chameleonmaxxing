@@ -76,7 +76,7 @@ class JoinPageState extends State<JoinPage> {
         ),
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(bottom: 50),
+        padding: const EdgeInsets.only(bottom: 40),
         child: WideButton(
           text: 'Cancel',
           color: Colors.red,

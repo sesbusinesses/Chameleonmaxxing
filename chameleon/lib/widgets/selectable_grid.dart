@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/database_manager.dart';
 import '../widgets/wide_button.dart'; // Adjust the import path as necessary
-import '../pages/reveal_page.dart'; // Ensure this import is correct
+// Ensure this import is correct
 
 class SelectableGrid extends StatefulWidget {
   final List<String> displayList;

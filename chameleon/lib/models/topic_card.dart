@@ -24,7 +24,7 @@ Future<List<TopicCard>> fetchTopicCards() async {
       // Check if 'wordList' exists and is not null, otherwise provide an empty list as default
       List<String> wordList = data['wordList'] != null ? List<String>.from(data['wordList']) : [];
       // Similarly, provide default values for color and imagePath if they are null
-      int color = data['color'] != null ? data['color'] : 0xFFFFE8D6; // Default
+      int color = data['color'] ?? 0xFFFFE8D6; // Default
       String? imagePath = data['imagePath'];
       return TopicCard(
         words: doc.id,

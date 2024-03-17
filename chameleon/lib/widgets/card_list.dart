@@ -6,7 +6,7 @@ import 'package:chameleon/models/topic_card.dart';
 const itemSize = 150.0;
 
 class CardList extends StatefulWidget {
-  const CardList({Key? key}) : super(key: key);
+  const CardList({super.key});
 
   @override
   State<CardList> createState() => _CardListState();
@@ -42,13 +42,13 @@ class _CardListState extends State<CardList> {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      title: Text('Add New Topic'),
+      title: const Text('Add New Topic'),
       content: SingleChildScrollView(
         child: ListBody(
           children: <Widget>[
             TextField(
               controller: topicController,
-              decoration: InputDecoration(hintText: 'Topic Name'),
+              decoration: const InputDecoration(hintText: 'Topic Name'),
             ),
             ...List.generate(10, (index) => TextField(
               controller: wordControllers[index],
@@ -59,11 +59,11 @@ class _CardListState extends State<CardList> {
       ),
       actions: <Widget>[
         TextButton(
-          child: Text('Cancel'),
+          child: const Text('Cancel'),
           onPressed: () => Navigator.of(context).pop(),
         ),
         TextButton(
-          child: Text('Add'),
+          child: const Text('Add'),
           onPressed: () {
             // Prepare data for the new TopicCard
             String topicName = topicController.text;
@@ -198,7 +198,7 @@ class _CardListState extends State<CardList> {
                                   padding: const EdgeInsets.only(top: 20.0), // Adjust the padding as needed
                                   child: Center(
                                       child: IconButton(
-                                          icon: Icon(Icons.add_circle_outline, size: 50),
+                                          icon: const Icon(Icons.add_circle_outline, size: 50),
                                           onPressed: () => _showAddTopicCardDialog(context),
                                       ),
                                   ),

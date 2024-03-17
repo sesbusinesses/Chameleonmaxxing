@@ -23,7 +23,7 @@ class DetailPage extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Text(
                       topicCard.words,
                       style: const TextStyle(
@@ -31,7 +31,7 @@ class DetailPage extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Expanded(
                       child: GridView.builder(
                         // Removed NeverScrollableScrollPhysics to allow scrolling if necessary

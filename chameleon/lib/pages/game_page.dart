@@ -3,7 +3,7 @@ import 'dart:async';
 import '../models/database_manager.dart';
 import 'game_topic_page.dart';
 import 'game_people_page.dart';
-import 'reveal_page.dart';
+import 'endgame_page.dart';
 
 class GamePage extends StatefulWidget {
   final String roomCode;
@@ -34,17 +34,17 @@ class _GamePageState extends State<GamePage> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => RevealPage(roomCode: widget.roomCode, playerId: widget.playerId),
+            builder: (context) => EndGamePage(roomCode: widget.roomCode),
           ),
         );
       }
     });
   }
 
-
   @override
   void dispose() {
-    voteNumSubscription.cancel(); // Corrected to the proper subscription variable
+    voteNumSubscription
+        .cancel(); // Corrected to the proper subscription variable
     super.dispose();
   }
 
@@ -58,8 +58,11 @@ class _GamePageState extends State<GamePage> {
       body: PageView(
         scrollDirection: Axis.horizontal,
         children: <Widget>[
-          GameTopicPage(roomCode: widget.roomCode, playerId: widget.playerId), // Use 'widget.' to access widget properties
-          GamePeoplePage(playerId: widget.playerId, roomCode: widget.roomCode),
+          GameTopicPage(
+              roomCode: widget.roomCode,
+              playerId:
+                  widget.playerId), // Use 'widget.' to access widget properties
+          GamePeoplePage(roomCode: widget.roomCode, playerId: widget.playerId),
         ],
       ),
     );
