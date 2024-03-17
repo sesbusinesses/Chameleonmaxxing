@@ -7,10 +7,10 @@ class EndGamePage extends StatefulWidget {
   final String playerId;
 
   const EndGamePage({
-    Key? key,
+    super.key,
     required this.roomCode,
     required this.playerId,
-  }) : super(key: key);
+  });
 
   @override
   _EndGamePageState createState() => _EndGamePageState();

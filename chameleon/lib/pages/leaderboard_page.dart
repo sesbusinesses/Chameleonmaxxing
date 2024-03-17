@@ -7,10 +7,10 @@ class LeaderboardPage extends StatefulWidget {
   final String playerId;
 
   const LeaderboardPage({
-    Key? key,
+    super.key,
     required this.roomCode,
     required this.playerId,
-  }) : super(key: key);
+  });
 
   @override
   State<LeaderboardPage> createState() => _LeaderboardPageState();
