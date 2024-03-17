@@ -4,21 +4,21 @@ import '../widgets/display_grid.dart';
 import '../widgets/wide_button.dart';
 import 'title_page.dart'; // Assume this is your app's title or home page
 
-class EndGamePage extends StatefulWidget {
+class PlayAgainPage extends StatefulWidget {
   final String roomCode;
   final String playerId;
 
-  const EndGamePage({
+  const PlayAgainPage({
     super.key,
     required this.roomCode,
     required this.playerId,
   });
 
   @override
-  _EndGamePageState createState() => _EndGamePageState();
+  _PlayAgainPageState createState() => _PlayAgainPageState();
 }
 
-class _EndGamePageState extends State<EndGamePage> {
+class _PlayAgainPageState extends State<PlayAgainPage> {
   late Future<bool> wasChameleonCaught;
   late Future<int> playerScore;
   late Future<bool> isPlayerHost;
@@ -41,10 +41,6 @@ class _EndGamePageState extends State<EndGamePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Game Over'),
-        automaticallyImplyLeading: false,
-      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
