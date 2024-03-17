@@ -740,4 +740,10 @@ class DatabaseManager {
       print("Error setting votePlayAgain: $e");
     }
   }
+
+  static Future<String> loadUsername() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('username') ??
+        'Default Username'; // Use a default value or leave empty
+  }
 }
