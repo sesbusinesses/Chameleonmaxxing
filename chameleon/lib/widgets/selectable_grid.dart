@@ -42,7 +42,8 @@ class SelectableGridState extends State<SelectableGrid> {
         widget.displayList.contains(initialSelection)) {
       setState(() {
         _selectedItemIndex = widget.displayList.indexOf(initialSelection);
-        _isSelectionConfirmed = true; // Confirm selection if there's an initial one
+        _isSelectionConfirmed =
+            true; // Confirm selection if there's an initial one
       });
     }
   }
@@ -76,7 +77,9 @@ class SelectableGridState extends State<SelectableGrid> {
                   decoration: BoxDecoration(
                     color: isSelected ? Colors.red : widget.color,
                     borderRadius: BorderRadius.circular(10),
-                    border: isSelected ? Border.all(color: Colors.white, width: 2) : null,
+                    border: isSelected
+                        ? Border.all(color: Colors.white, width: 2)
+                        : null,
                   ),
                   child: Text(
                     widget.displayList[index],
@@ -97,8 +100,11 @@ class SelectableGridState extends State<SelectableGrid> {
                   setState(() {
                     _isSelectionConfirmed = true;
                   });
-                  final selectedOption = widget.displayList[_selectedItemIndex!];
-                  DatabaseManager.updatePlayerSelection(widget.roomCode, widget.playerId, widget.updateField, selectedOption).then((_) {
+                  final selectedOption =
+                      widget.displayList[_selectedItemIndex!];
+                  DatabaseManager.updatePlayerSelection(widget.roomCode,
+                          widget.playerId, widget.updateField, selectedOption)
+                      .then((_) {
                     if (widget.updateField == 'votingCham') {
                       DatabaseManager.updateVoteNum(widget.roomCode);
                     }

@@ -25,6 +25,8 @@ class DatabaseManager {
           'username': username,
           'votingCham': "",
           'votingTopic': "",
+          'score': 0, // Initialize the score to 0 for the creator
+          'playAgain': false,
         }
       ]
     });
@@ -39,6 +41,8 @@ class DatabaseManager {
       'username': username,
       'votingCham': "",
       'votingTopic': "",
+      'score': 0, // Assign a starting score of zero for the new player
+      'playAgain': false,
     };
 
     DocumentReference roomRef = _db.collection('room_code').doc(roomCode);
@@ -246,6 +250,11 @@ class DatabaseManager {
           if (votingTopic.isNotEmpty) {
             topicVotes[votingTopic] = (topicVotes[votingTopic] ?? 0) + 1;
           }
+        }
+
+        for (int i = 0; i < players.length; i++) {
+          players[i]['playAgain'] =
+              false; // Reset 'playAgain' to false for all players
         }
 
         // Determine the topic for the game
@@ -524,23 +533,24 @@ class DatabaseManager {
       if (roomDoc.exists && roomDoc.data() != null) {
         Map<String, dynamic> roomData = roomDoc.data() as Map<String, dynamic>;
         List<dynamic> players = roomData['players'];
-        String? chameleonId;
+        String? chameleonUsername;
 
         // Identify the chameleon's playerID
         for (var player in players) {
           if (player['isCham'] == true) {
-            chameleonId = player['playerID'];
+            chameleonUsername = player['username'];
             break;
           }
         }
 
-        if (chameleonId == null)
+        if (chameleonUsername == null) {
           return false; // No chameleon found, or error in data structure
+        }
 
         // Count votes for each player
         Map<String, int> voteCounts = {};
         for (var player in players) {
-          String votedFor = player['votedFor'] ?? '';
+          String votedFor = player['votingCham'] ?? '';
           if (votedFor.isNotEmpty) {
             voteCounts[votedFor] = (voteCounts[votedFor] ?? 0) + 1;
           }
@@ -550,7 +560,7 @@ class DatabaseManager {
         String? mostVotedFor = voteCounts.entries
             .reduce((curr, next) => curr.value > next.value ? curr : next)
             .key;
-        return chameleonId == mostVotedFor;
+        return chameleonUsername == mostVotedFor;
       }
     } catch (e) {
       print("Error checking if chameleon was caught: $e");
@@ -579,5 +589,65 @@ class DatabaseManager {
       print("Error fetching chameleon's username: $e");
     }
     return null; // Return null if chameleon's username couldn't be found or on error
+  }
+
+  static Future<void> endGame(String roomCode) async {
+    try {
+      // Fetch the game room document.
+      DocumentReference roomRef = _db.collection('room_code').doc(roomCode);
+      DocumentSnapshot roomSnapshot = await roomRef.get();
+
+      if (!roomSnapshot.exists || roomSnapshot.data() == null) {
+        print("Room does not exist.");
+        return;
+      }
+
+      List<dynamic> players = List.from(roomSnapshot['players']);
+      String? chameleonId;
+      String? chameleonUsername;
+      bool chameleonGuessedWord = false;
+
+      // Identify the chameleon and whether they guessed the word.
+      for (var player in players) {
+        if (player['isCham'] == true) {
+          chameleonId = player['playerID'];
+          chameleonUsername = player['username'];
+          chameleonGuessedWord =
+              player['chamGuess'] == roomSnapshot['topicWord'];
+          break;
+        }
+      }
+
+      if (chameleonId == null) {
+        print("No chameleon found.");
+        return;
+      }
+
+      // Update scores based on the game outcome.
+      for (var player in players) {
+        if (player['playerID'] != chameleonId &&
+            player['votingCham'] == chameleonUsername) {
+          // For every player that voted for the chameleon (excluding the chameleon), their score goes up by one.
+          player['score'] = (player['score'] ?? 0) + 1;
+        }
+      }
+
+      if (chameleonGuessedWord) {
+        // If the chameleon guessed the word, their score goes up by two.
+        var chameleon = players.firstWhere((p) => p['playerID'] == chameleonId);
+        chameleon['score'] = (chameleon['score'] ?? 0) + 2;
+      }
+
+      // Update the game room document with the new scores.
+      await roomRef.update({'players': players});
+
+      // Optionally, mark the game as no longer running and reset necessary fields.
+      await roomRef.update({
+        'gameRunning': false,
+        // Reset or update any other necessary fields here.
+      });
+    } catch (e) {
+      print("Error ending game: $e");
+    }
   }
 }

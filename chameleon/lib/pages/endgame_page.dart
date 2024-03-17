@@ -5,7 +5,7 @@ import '../widgets/wide_button.dart';
 class EndGamePage extends StatefulWidget {
   final String roomCode;
 
-  const EndGamePage({Key? key, required this.roomCode}) : super(key: key);
+  const EndGamePage({super.key, required this.roomCode});
 
   @override
   _EndGamePageState createState() => _EndGamePageState();
@@ -37,7 +37,7 @@ class _EndGamePageState extends State<EndGamePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Game Over'),
+        title: const Text('Game Over'),
         automaticallyImplyLeading: false,
       ),
       body: Center(
@@ -48,12 +48,12 @@ class _EndGamePageState extends State<EndGamePage> {
               chameleonCaught == true
                   ? 'Chameleon was caught!'
                   : 'Chameleon escaped!',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
               'Chameleon was: $chameleonPlayerId',
-              style: TextStyle(fontSize: 20),
+              style: const TextStyle(fontSize: 20),
             ),
           ],
         ),
@@ -70,7 +70,7 @@ class _EndGamePageState extends State<EndGamePage> {
                   // Navigate to game setup or lobby
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               WideButton(
                 text: 'Exit',
                 color: Colors.red,
