@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/database_manager.dart';
 import '../widgets/selectable_grid.dart';
-import '../widgets/wide_button.dart';
 
 class GamePeoplePage extends StatelessWidget {
   final String roomCode;
@@ -38,13 +37,17 @@ class GamePeoplePage extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: SelectableGrid( // add a code that moves to reveal_page.dart
+                  child: SelectableGrid(
+                    // add a code that moves to reveal_page.dart
                     displayList: snapshot.data!,
                     color: Colors.grey,
                     updateField: 'votingCham',
                     roomCode: roomCode,
                     playerId: playerId,
                   ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 40),
                 ),
               ],
             );

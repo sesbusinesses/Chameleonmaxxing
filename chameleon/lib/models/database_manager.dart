@@ -86,7 +86,9 @@ class DatabaseManager {
       (snapshot) {
         if (snapshot.exists) {
           List<dynamic> players = snapshot['players'];
-          return players.map<String>((player) => player['username'] as String).toList();
+          return players
+              .map<String>((player) => player['username'] as String)
+              .toList();
         }
         return [];
       },
@@ -98,7 +100,10 @@ class DatabaseManager {
       (snapshot) {
         if (snapshot.exists) {
           List<dynamic> players = snapshot['players'];
-          return players.map<bool>((player) => (player['votingTopic'] != null && player['votingTopic'] != "")).toList();
+          return players
+              .map<bool>((player) => (player['votingTopic'] != null &&
+                  player['votingTopic'] != ""))
+              .toList();
         }
         return [];
       },
@@ -116,9 +121,6 @@ class DatabaseManager {
       },
     );
   }
-
-
-
 
   static Future<void> setPlayerVotingCham(
       String roomCode, String playerId, String votingCham) async {
@@ -271,7 +273,7 @@ class DatabaseManager {
           'players': players,
           'Topic': mostCommonTopic,
           'topicWord': topicWord,
-          'voteNum' : 0,
+          'voteNum': 0,
         });
       }
     } catch (e) {
@@ -416,13 +418,13 @@ class DatabaseManager {
     }
     return false; // Return false if player not found or in case of any error
   }
-  
+
   static Stream<bool> streamDoesRoomExist(String roomCode) {
-  return FirebaseFirestore.instance
-      .collection('room_code')
-      .doc(roomCode)
-      .snapshots()
-      .map((snapshot) => snapshot.exists);
+    return FirebaseFirestore.instance
+        .collection('room_code')
+        .doc(roomCode)
+        .snapshots()
+        .map((snapshot) => snapshot.exists);
   }
 
   // Method to count number of players in the game room
@@ -437,38 +439,37 @@ class DatabaseManager {
   }
 
   static Stream<bool> getVoteNumStream(String roomCode) {
-  StreamController<bool> controller = StreamController<bool>();
-  
-  // This variable will hold the latest player count.
-  int? latestPlayerCount;
+    StreamController<bool> controller = StreamController<bool>();
 
-  // Start listening to the player count updates.
-  // You may want to handle this more robustly in a real app, e.g., refreshing periodically.
-  countPlayersInRoom(roomCode).then((count) {
-    latestPlayerCount = count;
-  }).catchError((_) {
-    latestPlayerCount = 0; // Handle error or maintain old count
-  });
+    // This variable will hold the latest player count.
+    int? latestPlayerCount;
 
-  // Subscribe to voteNum changes from Firestore.
-  FirebaseFirestore.instance
-    .collection('room_code')
-    .doc(roomCode)
-    .snapshots()
-    .listen((snapshot) {
+    // Start listening to the player count updates.
+    // You may want to handle this more robustly in a real app, e.g., refreshing periodically.
+    countPlayersInRoom(roomCode).then((count) {
+      latestPlayerCount = count;
+    }).catchError((_) {
+      latestPlayerCount = 0; // Handle error or maintain old count
+    });
+
+    // Subscribe to voteNum changes from Firestore.
+    FirebaseFirestore.instance
+        .collection('room_code')
+        .doc(roomCode)
+        .snapshots()
+        .listen((snapshot) {
       final voteNum = snapshot.data()?['voteNum'] as int? ?? 0;
-      
+
       // Check if we have a latest player count and compare.
       if (latestPlayerCount != null) {
-        controller.add(voteNum > latestPlayerCount!-1);
+        controller.add(voteNum > latestPlayerCount! - 1);
       }
     }).onError((_) {
       controller.add(false); // Handle stream errors or complete the stream
     });
 
-  return controller.stream;
-}
-
+    return controller.stream;
+  }
 
   // Setter method for voteNum
   static Future<void> updateVoteNum(String roomCode) async {
@@ -481,10 +482,102 @@ class DatabaseManager {
         throw Exception("Room does not exist!");
       }
 
-      int currentVoteNum = snapshot['voteNum'] ?? 0; // Get the current number of votes, defaulting to 0 if none
-      transaction.update(roomRef, {'voteNum': currentVoteNum + 1}); // Increment the vote number by 1
+      int currentVoteNum = snapshot['voteNum'] ??
+          0; // Get the current number of votes, defaulting to 0 if none
+      transaction.update(roomRef,
+          {'voteNum': currentVoteNum + 1}); // Increment the vote number by 1
     });
   }
 
-  
+  static Future<String?> getChameleonPlayerId(String roomCode) async {
+    try {
+      // Fetch the room document by roomCode
+      DocumentSnapshot roomDoc =
+          await _db.collection('room_code').doc(roomCode).get();
+
+      // Check if the document exists and has data
+      if (roomDoc.exists && roomDoc.data() != null) {
+        Map<String, dynamic> roomData = roomDoc.data() as Map<String, dynamic>;
+        List<dynamic> players = roomData['players'];
+
+        // Find the player marked as the chameleon
+        var chameleon = players.firstWhere(
+          (player) => player['isCham'] == true,
+          orElse: () => null,
+        );
+
+        // Return the chameleon's playerID if found
+        return chameleon != null ? chameleon['playerID'] : null;
+      }
+    } catch (e) {
+      print("Error getting chameleon player ID: $e");
+    }
+    return null; // Return null if not found or on error
+  }
+
+  static Future<bool> wasChameleonCaught(String roomCode) async {
+    try {
+      // Fetch the room document by roomCode
+      DocumentSnapshot roomDoc =
+          await _db.collection('room_code').doc(roomCode).get();
+
+      if (roomDoc.exists && roomDoc.data() != null) {
+        Map<String, dynamic> roomData = roomDoc.data() as Map<String, dynamic>;
+        List<dynamic> players = roomData['players'];
+        String? chameleonId;
+
+        // Identify the chameleon's playerID
+        for (var player in players) {
+          if (player['isCham'] == true) {
+            chameleonId = player['playerID'];
+            break;
+          }
+        }
+
+        if (chameleonId == null)
+          return false; // No chameleon found, or error in data structure
+
+        // Count votes for each player
+        Map<String, int> voteCounts = {};
+        for (var player in players) {
+          String votedFor = player['votedFor'] ?? '';
+          if (votedFor.isNotEmpty) {
+            voteCounts[votedFor] = (voteCounts[votedFor] ?? 0) + 1;
+          }
+        }
+
+        // Determine if the chameleon was most voted for
+        String? mostVotedFor = voteCounts.entries
+            .reduce((curr, next) => curr.value > next.value ? curr : next)
+            .key;
+        return chameleonId == mostVotedFor;
+      }
+    } catch (e) {
+      print("Error checking if chameleon was caught: $e");
+    }
+    return false; // Default return false if unable to determine or on error
+  }
+
+  static Future<String?> getChameleonUsername(String roomCode) async {
+    try {
+      // Fetch the room document by roomCode
+      DocumentSnapshot roomDoc =
+          await _db.collection('room_code').doc(roomCode).get();
+
+      if (roomDoc.exists && roomDoc.data() != null) {
+        Map<String, dynamic> roomData = roomDoc.data() as Map<String, dynamic>;
+        List<dynamic> players = roomData['players'];
+
+        // Iterate through players to find the chameleon
+        for (var player in players) {
+          if (player['isCham'] == true) {
+            return player['username']; // Return the username of the chameleon
+          }
+        }
+      }
+    } catch (e) {
+      print("Error fetching chameleon's username: $e");
+    }
+    return null; // Return null if chameleon's username couldn't be found or on error
+  }
 }
