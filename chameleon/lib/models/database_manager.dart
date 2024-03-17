@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DatabaseManager {
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
