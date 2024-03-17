@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../widgets/wide_button.dart';
 import 'join_page.dart';
 import 'waiting_page.dart';
+import 'profile_page.dart';
 
 class TitlePage extends StatelessWidget {
   const TitlePage({super.key});
@@ -13,6 +14,17 @@ class TitlePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Title Page'),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.account_circle),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfilePage()),
+              );
+            },
+          ),
+        ],
       ),
       body: Center(
         child: Column(
