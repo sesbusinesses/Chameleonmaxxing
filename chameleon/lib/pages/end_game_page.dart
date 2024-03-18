@@ -43,7 +43,7 @@ class _EndGamePageState extends State<EndGamePage> {
         // Execute async code inside microtask
         Future.microtask(() async {
           // Perform necessary async operations before navigating
-          await DatabaseManager.resetToPlayAgain(widget.roomCode, widget.playerId, 1);
+          await DatabaseManager.resetToPlayAgain(widget.roomCode);
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(

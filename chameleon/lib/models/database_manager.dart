@@ -8,58 +8,50 @@ import 'player_score.dart';
 class DatabaseManager {
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  static Future<void> resetToPlayAgain(String roomCode, String playerId,int score) async {
-  var roomQuery = await FirebaseFirestore.instance
-      .collection('room_code')
-      .where('code', isEqualTo: roomCode)
-      .limit(1)
-      .get();
-
-  // Reset specific fields in the room document
-  await _db.collection('room_code').doc(roomCode).update({
-    'voteNum': FieldValue.delete(),      // Remove the voteNum field
-    'topicWord': FieldValue.delete(),    // Remove the topicWord field
-    'Topic': FieldValue.delete(),        // Remove the Topic field
-    // Add more fields to reset if necessary
-  });
-
-  
-
-  if (roomQuery.docs.isNotEmpty) {
-    var docId = roomQuery.docs.first.id;
-    var players = List.from(roomQuery.docs.first.get('players'));
-    var updatedPlayers = players.map((player) {
-  // Initialize an updatedPlayer variable to hold changes
-  Map updatedPlayer = Map.from(player); 
-
-  // Check if the player is the champion and needs chamGuess to be removed
-  if (updatedPlayer['isCham'] == true) {
-    updatedPlayer.remove('chamGuess'); // Remove 'chamGuess' field
-  }
-
-  // Check if the player is the one being reset
-  if (updatedPlayer['playerID'] == playerId) {
-    updatedPlayer = {
-      ...updatedPlayer, // Preserve existing fields
-      'playAgain': false,
-      'isCham': false,
-      'votingCham': "",
-      'votingTopic': "",
-      'score': score, // Set the new score
-      // Reset other player-specific fields as necessary
-    };
-  }
-  
-  return updatedPlayer; // Return the updated player information
-}).toList();
-
-
-    await FirebaseFirestore.instance
+  static Future<void> resetToPlayAgain(String roomCode) async {
+    var roomQuery = await FirebaseFirestore.instance
         .collection('room_code')
-        .doc(docId)
-        .update({'players': updatedPlayers});
+        .where('code', isEqualTo: roomCode)
+        .limit(1)
+        .get();
+
+    // Reset specific fields in the room document
+    await FirebaseFirestore.instance.collection('room_code').doc(roomCode).update({
+      'voteNum': FieldValue.delete(),      // Remove the voteNum field
+      'topicWord': FieldValue.delete(),    // Remove the topicWord field
+      'Topic': FieldValue.delete(),        // Remove the Topic field
+      // Add more fields to reset if necessary
+    });
+
+    if (roomQuery.docs.isNotEmpty) {
+      var docId = roomQuery.docs.first.id;
+      var players = List.from(roomQuery.docs.first.get('players'));
+      var updatedPlayers = players.map((player) {
+        // Initialize an updatedPlayer variable to hold changes
+        Map updatedPlayer = Map.from(player); 
+
+        // Check if the player is the champion and needs chamGuess to be removed
+        if (updatedPlayer['isCham'] == true) {
+          updatedPlayer.remove('chamGuess'); // Remove 'chamGuess' field
+        }
+
+        // Reset fields for every player
+        updatedPlayer['playAgain'] = false;
+        updatedPlayer['isCham'] = false;
+        updatedPlayer['votingCham'] = "";
+        updatedPlayer['votingTopic'] = "";
+        // Add other fields to reset if necessary
+
+        return updatedPlayer; // Return the updated player information
+      }).toList();
+
+      await FirebaseFirestore.instance
+          .collection('room_code')
+          .doc(docId)
+          .update({'players': updatedPlayers});
+    }
   }
-  }
+
 
 
   static String generateCode() {
