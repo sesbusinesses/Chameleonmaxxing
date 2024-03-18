@@ -129,7 +129,7 @@ class _PlayAgainPageState extends State<PlayAgainPage> {
               text: 'Play Again',
               color: Colors.green,
               onPressed: () {
-                DatabaseManager.votePlayAgain(widget.roomCode, widget.playerId);
+                DatabaseManager.votePlayAgain(widget.roomCode,widget.playerId);
               },
             ),
             const SizedBox(height: 15),

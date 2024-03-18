@@ -8,6 +8,60 @@ import 'player_score.dart';
 class DatabaseManager {
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
 
+  static Future<void> resetToPlayAgain(String roomCode, String playerId,int score) async {
+  var roomQuery = await FirebaseFirestore.instance
+      .collection('room_code')
+      .where('code', isEqualTo: roomCode)
+      .limit(1)
+      .get();
+
+  // Reset specific fields in the room document
+  await _db.collection('room_code').doc(roomCode).update({
+    'voteNum': FieldValue.delete(),      // Remove the voteNum field
+    'topicWord': FieldValue.delete(),    // Remove the topicWord field
+    'Topic': FieldValue.delete(),        // Remove the Topic field
+    // Add more fields to reset if necessary
+  });
+
+  
+
+  if (roomQuery.docs.isNotEmpty) {
+    var docId = roomQuery.docs.first.id;
+    var players = List.from(roomQuery.docs.first.get('players'));
+    var updatedPlayers = players.map((player) {
+  // Initialize an updatedPlayer variable to hold changes
+  Map updatedPlayer = Map.from(player); 
+
+  // Check if the player is the champion and needs chamGuess to be removed
+  if (updatedPlayer['isCham'] == true) {
+    updatedPlayer.remove('chamGuess'); // Remove 'chamGuess' field
+  }
+
+  // Check if the player is the one being reset
+  if (updatedPlayer['playerID'] == playerId) {
+    updatedPlayer = {
+      ...updatedPlayer, // Preserve existing fields
+      'playAgain': false,
+      'isCham': false,
+      'votingCham': "",
+      'votingTopic': "",
+      'score': score, // Set the new score
+      // Reset other player-specific fields as necessary
+    };
+  }
+  
+  return updatedPlayer; // Return the updated player information
+}).toList();
+
+
+    await FirebaseFirestore.instance
+        .collection('room_code')
+        .doc(docId)
+        .update({'players': updatedPlayers});
+  }
+  }
+
+
   static String generateCode() {
     const String chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     Random rnd = Random();
@@ -133,6 +187,7 @@ class DatabaseManager {
       },
     );
   }
+
 
   static Stream<bool> streamGameRunning(String roomCode) {
     return _db.collection('room_code').doc(roomCode).snapshots().map(
@@ -652,13 +707,46 @@ class DatabaseManager {
       await _db.runTransaction((transaction) async {
         transaction.update(roomRef, {
           'players': updatedPlayers,
-          'gameRunning': false,
+          'gameRunning' : false,
           'voteNum': 0, // Reset vote count or any other game state as needed
         });
       });
     } catch (e) {
       print("Error ending game: $e");
     }
+  }
+
+  static Stream<bool> getPlayAgainNumStream(String roomCode) {
+    StreamController<bool> controller = StreamController<bool>();
+
+    // This variable will hold the latest player count.
+    int? latestPlayerCount;
+
+    // Start listening to the player count updates.
+    // You may want to handle this more robustly in a real app, e.g., refreshing periodically.
+    countPlayersInRoom(roomCode).then((count) {
+      latestPlayerCount = count;
+    }).catchError((_) {
+      latestPlayerCount = 0; // Handle error or maintain old count
+    });
+
+    // Subscribe to voteNum changes from Firestore.
+    FirebaseFirestore.instance
+        .collection('room_code')
+        .doc(roomCode)
+        .snapshots()
+        .listen((snapshot) {
+      final voteNum = snapshot.data()?['voteNum'] as int? ?? 0;
+
+      // Check if we have a latest player count and compare.
+      if (latestPlayerCount != null) {
+        controller.add(voteNum > latestPlayerCount!-1);
+      }
+    }).onError((_) {
+      controller.add(false); // Handle stream errors or complete the stream
+    });
+
+    return controller.stream;
   }
 
   static Future<bool> isHost(String roomCode, String playerId) async {
