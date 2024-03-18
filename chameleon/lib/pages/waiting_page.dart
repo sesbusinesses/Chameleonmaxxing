@@ -5,6 +5,7 @@ import 'waiting_people_page.dart';
 import 'waiting_topics_page.dart';
 import '../widgets/utility.dart';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WaitingPage extends StatefulWidget {
   final bool isHost;
@@ -27,6 +28,8 @@ class _WaitingPageState extends State<WaitingPage> {
   late StreamSubscription<bool> gameRunningSubscription;
   late Stream<bool> doesRoomExistStream;
   late StreamSubscription<bool> doesRoomExistSubscription;
+  bool showSwipePrompt = true;
+  PageController _pageController = PageController();
 
   @override
   void initState() {
@@ -60,6 +63,27 @@ class _WaitingPageState extends State<WaitingPage> {
     });
   }
 
+  Future<void> _checkFirstVisit() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      showSwipePrompt = (prefs.getBool('hasVisitedWaitingPage') ?? false) == false;
+    });
+  }
+
+  void _hideSwipePrompt() {
+    if (showSwipePrompt) {
+      setState(() {
+        showSwipePrompt = false;
+      });
+      _saveVisitStatus();
+    }
+  }
+
+  Future<void> _saveVisitStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hasVisitedWaitingPage', true);
+  }
+
   @override
   void dispose() {
     gameRunningSubscription.cancel();
@@ -71,19 +95,38 @@ class _WaitingPageState extends State<WaitingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-            'Join Code: ${widget.roomCode}'), // Display roomCode in AppBar title
-        automaticallyImplyLeading: false, // Removes the back arrow
+        title: Text('Join Code: ${widget.roomCode}'),
+        automaticallyImplyLeading: false,
       ),
-      body: PageView(
-        scrollDirection: Axis.horizontal,
-        children: <Widget>[
-          WaitingTopicsPage(
-              roomCode: widget.roomCode, playerId: widget.playerId),
-          WaitingPeoplePage(
-              isHost: widget.isHost,
-              roomCode: widget.roomCode,
-              playerId: widget.playerId),
+      body: Stack(
+        children: [
+          PageView(
+            controller: _pageController,
+            scrollDirection: Axis.horizontal,
+            onPageChanged: (int page) {
+              _hideSwipePrompt();
+            },
+            children: <Widget>[
+              WaitingTopicsPage(roomCode: widget.roomCode, playerId: widget.playerId),
+              WaitingPeoplePage(isHost: widget.isHost, roomCode: widget.roomCode, playerId: widget.playerId),
+            ],
+          ),
+          if (showSwipePrompt)
+            Positioned(
+              bottom: 50,
+              left: 0,
+              right: 0,
+              child: Center(
+                child: Container(
+                  padding: EdgeInsets.all(8),
+                  color: Colors.black54,
+                  child: Text(
+                    "Swipe to see more →",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
