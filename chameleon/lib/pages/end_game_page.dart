@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'play_again_page.dart'; // Make sure to import your PlayAgainPage
-import 'leaderboard_page.dart'; // Make sure to import your LeaderboardPage
+import 'play_again_page.dart';
+import 'leaderboard_page.dart';
 import '../models/database_manager.dart';
 import '../widgets/utility.dart';
 import 'dart:async';
+import 'waiting_page.dart';
 
 class EndGamePage extends StatefulWidget {
   final String roomCode;
@@ -19,36 +20,44 @@ class EndGamePage extends StatefulWidget {
   _EndGamePageState createState() => _EndGamePageState();
 }
 
-class _EndGamePageState extends State<EndGamePage> {  
-  //late Stream<bool> gameRunningStream;
-  //late StreamSubscription<bool> gameRunningSubscription;
+class _EndGamePageState extends State<EndGamePage> {
+  late Stream<List<bool>> runGameAgainStream;
+  late StreamSubscription<List<bool>> runGameAgainSubscription;
   late Stream<bool> doesRoomExistStream;
   late StreamSubscription<bool> doesRoomExistSubscription;
-  
+  bool host = false; // Add the host variable
+
   @override
   void initState() {
     super.initState();
-    
-    //gameRunningStream = DatabaseManager.streamGameRunning(widget.roomCode);
+
+    // Determine if the current player is the host
+    _checkIfHost();
+
+    runGameAgainStream = DatabaseManager.streamPlayAgainStatus(widget.roomCode);
     doesRoomExistStream = DatabaseManager.streamDoesRoomExist(widget.roomCode);
 
-    /*
-    gameRunningSubscription = gameRunningStream.listen((isGameRunning) {
-      if (isGameRunning) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => GamePage(
-              roomCode: widget.roomCode,
-              playerId: widget.playerId,
+    runGameAgainSubscription = runGameAgainStream.listen((List<bool> playersReadyList) {
+      final allPlayersReady = playersReadyList.every((isReady) => isReady);
+      if (allPlayersReady) {
+        // Execute async code inside microtask
+        Future.microtask(() async {
+          // Perform necessary async operations before navigating
+          await DatabaseManager.resetToPlayAgain(widget.roomCode, widget.playerId, 1);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => WaitingPage(
+                isHost: host, // Use the 'host' variable
+                roomCode: widget.roomCode,
+                playerId: widget.playerId,
+              ),
             ),
-          ),
-        );
+          );
+        });
       }
     });
-    */
 
-    doesRoomExistStream = DatabaseManager.streamDoesRoomExist(widget.roomCode);
     doesRoomExistSubscription = doesRoomExistStream.listen((doesGameExist) {
       if (!doesGameExist) {
         Navigator.popUntil(context, (route) => route.isFirst);
@@ -57,13 +66,19 @@ class _EndGamePageState extends State<EndGamePage> {
     });
   }
 
+  Future<void> _checkIfHost() async {
+    bool isHost = await DatabaseManager.isHost(widget.roomCode, widget.playerId);
+    setState(() {
+      host = isHost; // Set the host status based on the result
+    });
+  }
+
   @override
   void dispose() {
-    //gameRunningSubscription.cancel();
+    runGameAgainSubscription.cancel();
     doesRoomExistSubscription.cancel();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
