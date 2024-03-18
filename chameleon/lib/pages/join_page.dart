@@ -65,34 +65,37 @@ class JoinPageState extends State<JoinPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Join Game'),
-        automaticallyImplyLeading: false,
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            TextBox(
-              hintText: 'Enter join code',
-              controller: _gameCodeController,
-            ),
-            WideButton(
-              text: 'Join Game',
-              onPressed: _tryJoinGame,
-            ),
-          ],
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Join Game'),
+          automaticallyImplyLeading: false,
         ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(bottom: 40),
-        child: WideButton(
-          text: 'Cancel',
-          color: Colors.red,
-          onPressed: () => Navigator.pop(context),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              TextBox(
+                hintText: 'Enter join code',
+                controller: _gameCodeController,
+              ),
+              WideButton(
+                text: 'Join Game',
+                onPressed: _tryJoinGame,
+              ),
+            ],
+          ),
         ),
-      ),
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.only(bottom: 40),
+          child: WideButton(
+            text: 'Cancel',
+            color: Colors.red,
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+      )
     );
   }
 

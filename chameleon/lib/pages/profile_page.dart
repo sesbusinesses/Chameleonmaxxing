@@ -34,51 +34,54 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        automaticallyImplyLeading: false, // Removes the back button
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'Edit Username',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+    return PopScope(
+      canPop: false,
+      child:  Scaffold(
+        appBar: AppBar(
+          title: const Text('Profile'),
+          automaticallyImplyLeading: false, // Removes the back button
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Edit Username',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                TextBox(
-                  hintText: 'Username',
-                  controller: _usernameController,
-                ),
-              ],
-            ),
-            WideButton(
-              text: 'How To Play',
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HowToPage()),
-                );
-              },
-            ),
-          ],
+                  TextBox(
+                    hintText: 'Username',
+                    controller: _usernameController,
+                  ),
+                ],
+              ),
+              WideButton(
+                text: 'How To Play',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HowToPage()),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(bottom: 40.0),
-        child: WideButton(
-          text: 'Save and Exit',
-          color: Colors.red,
-          onPressed: _saveUsernameAndExit,
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.only(bottom: 40.0),
+          child: WideButton(
+            text: 'Save and Exit',
+            color: Colors.red,
+            onPressed: _saveUsernameAndExit,
+          ),
         ),
-      ),
+      )
     );
   }
 

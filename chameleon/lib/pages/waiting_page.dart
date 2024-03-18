@@ -1,3 +1,4 @@
+import 'package:chameleon/widgets/swipe_more.dart';
 import 'package:flutter/material.dart';
 import 'game_page.dart';
 import '../models/database_manager.dart';
@@ -93,41 +94,35 @@ class _WaitingPageState extends State<WaitingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Join Code: ${widget.roomCode}'),
-        automaticallyImplyLeading: false,
-      ),
-      body: Stack(
-        children: [
-          PageView(
-            controller: _pageController,
-            scrollDirection: Axis.horizontal,
-            onPageChanged: (int page) {
-              _hideSwipePrompt();
-            },
-            children: <Widget>[
-              WaitingTopicsPage(roomCode: widget.roomCode, playerId: widget.playerId),
-              WaitingPeoplePage(isHost: widget.isHost, roomCode: widget.roomCode, playerId: widget.playerId),
-            ],
-          ),
-          if (showSwipePrompt)
-            Positioned(
-              bottom: 50,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Container(
-                  padding: EdgeInsets.all(8),
-                  color: Colors.black54,
-                  child: Text(
-                    "Swipe to see more →",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Join Code: ${widget.roomCode}'),
+          automaticallyImplyLeading: false,
+        ),
+        body: Stack(
+          children: [
+            PageView(
+              controller: _pageController,
+              scrollDirection: Axis.horizontal,
+              onPageChanged: (int page) {
+                _hideSwipePrompt();
+              },
+              children: <Widget>[
+                WaitingTopicsPage(roomCode: widget.roomCode, playerId: widget.playerId),
+                WaitingPeoplePage(isHost: widget.isHost, roomCode: widget.roomCode, playerId: widget.playerId),
+              ],
             ),
-        ],
+            if (showSwipePrompt)
+              Positioned(
+                bottom: 200,
+                left: 0,
+                right: 0,
+                child: FloatingText(),
+              ),
+          ],
+        ),
       ),
     );
   }
