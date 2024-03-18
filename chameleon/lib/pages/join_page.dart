@@ -45,6 +45,13 @@ class JoinPageState extends State<JoinPage> {
       return;
     }
 
+    // Check if the game is already running
+    bool gameRunning = await DatabaseManager.streamGameRunning(roomCode).first;
+    if (gameRunning) {
+      showMessage(context, 'Cannot join, the game is already running');
+      return;
+    }
+
     // If the room exists, attempt to add the player with detailed information
     try {
       String playerId = DatabaseManager.generateCode();
