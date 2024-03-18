@@ -4,6 +4,7 @@ import '../widgets/wide_button.dart';
 import '../widgets/text_box.dart';
 import 'waiting_page.dart';
 import '../widgets/utility.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class JoinPage extends StatefulWidget {
   const JoinPage({super.key});
@@ -14,13 +15,26 @@ class JoinPage extends StatefulWidget {
 
 class JoinPageState extends State<JoinPage> {
   final TextEditingController _gameCodeController = TextEditingController();
-  final TextEditingController _usernameController = TextEditingController();
+  String _username = ''; // Store the fetched username here
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUsername();
+  }
+
+  Future<void> _fetchUsername() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    String username = prefs.getString('username') ?? '';
+    setState(() {
+      _username = username; // Set the fetched username
+    });
+  }
 
   void _tryJoinGame() async {
     String roomCode = _gameCodeController.text.trim().toUpperCase();
-    String username = _usernameController.text.trim();
-    if (roomCode.isEmpty || username.isEmpty) {
-      showMessage(context, 'Join code and username cannot be empty');
+    if (roomCode.isEmpty) {
+      showMessage(context, 'Join code cannot be empty');
       return;
     }
 
@@ -35,7 +49,7 @@ class JoinPageState extends State<JoinPage> {
     try {
       String playerId = DatabaseManager.generateCode();
       // Adjust the addPlayerToRoom method to include the player's detailed information
-      await DatabaseManager.addPlayerToRoom(roomCode, playerId, username);
+      await DatabaseManager.addPlayerToRoom(roomCode, playerId, _username);
       // Navigate to WaitingPage if adding is successful
       Navigator.push(
         context,
@@ -64,10 +78,6 @@ class JoinPageState extends State<JoinPage> {
               hintText: 'Enter join code',
               controller: _gameCodeController,
             ),
-            TextBox(
-              hintText: 'Enter your username',
-              controller: _usernameController,
-            ),
             WideButton(
               text: 'Join Game',
               onPressed: _tryJoinGame,
@@ -89,7 +99,6 @@ class JoinPageState extends State<JoinPage> {
   @override
   void dispose() {
     _gameCodeController.dispose();
-    _usernameController.dispose(); // Ensure usernameController is also disposed
     super.dispose();
   }
 }
