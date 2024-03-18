@@ -51,8 +51,8 @@ class _PlayAgainPageState extends State<PlayAgainPage> {
                 if (snapshot.connectionState == ConnectionState.done) {
                   return Text(
                     snapshot.data == true
-                        ? 'Chameleon was caught!'
-                        : 'Chameleon escaped!',
+                        ? 'Alien was caught!'
+                        : 'Alien escaped!',
                     style: const TextStyle(
                         fontSize: 24, fontWeight: FontWeight.bold),
                   );
@@ -67,9 +67,9 @@ class _PlayAgainPageState extends State<PlayAgainPage> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done &&
                     snapshot.hasData) {
-                  return Text('Chameleon was: ${snapshot.data}');
+                  return Text('Alien was: ${snapshot.data}');
                 } else {
-                  return const Text('Loading chameleon identity...');
+                  return const Text('Loading alien identity...');
                 }
               },
             ),

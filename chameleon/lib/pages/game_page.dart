@@ -74,16 +74,18 @@ class _GamePageState extends State<GamePage> {
       pages.add(
           ChamGuessPage(roomCode: widget.roomCode, playerId: widget.playerId));
     }
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Game Page'),
-        automaticallyImplyLeading: false,
-      ),
-      body: PageView(
-        scrollDirection: Axis.horizontal,
-        children: pages,
-      ),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Game Page'),
+          automaticallyImplyLeading: false,
+        ),
+        body: PageView(
+          scrollDirection: Axis.horizontal,
+          children: pages,
+        ),
+      )
     );
   }
 }

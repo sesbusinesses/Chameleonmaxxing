@@ -82,17 +82,20 @@ class _EndGamePageState extends State<EndGamePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Game Over'),
-        automaticallyImplyLeading: false,
-      ),
-      body: PageView(
-        children: <Widget>[
-          PlayAgainPage(roomCode: widget.roomCode, playerId: widget.playerId),
-          LeaderboardPage(roomCode: widget.roomCode, playerId: widget.playerId),
-        ],
-      ),
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Game Over'),
+          automaticallyImplyLeading: false,
+        ),
+        body: PageView(
+          children: <Widget>[
+            PlayAgainPage(roomCode: widget.roomCode, playerId: widget.playerId),
+            LeaderboardPage(roomCode: widget.roomCode, playerId: widget.playerId),
+          ],
+        ),
+      )
     );
   }
 }

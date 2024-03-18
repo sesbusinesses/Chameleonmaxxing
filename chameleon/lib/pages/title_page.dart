@@ -31,14 +31,14 @@ class TitlePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             const Text(
-              'Chameleonmaxxing!',
+              'The Spooky Alien',
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Image.asset(
-              'assets/images/chameleon.png',
+              'assets/images/alien2.webp',
               width: 300, // Set the width as needed
               height: 300, // Set the height as needed
             ),
