@@ -105,7 +105,7 @@ class SelectableGridState extends State<SelectableGrid> {
                   DatabaseManager.updatePlayerSelection(widget.roomCode,
                           widget.playerId, widget.updateField, selectedOption)
                       .then((_) {
-                    if (widget.updateField == 'votingCham') {
+                    if (widget.updateField == 'votingCham' ||widget.updateField == 'chamGuess') {
                       DatabaseManager.updateVoteNum(widget.roomCode);
                     }
                   });

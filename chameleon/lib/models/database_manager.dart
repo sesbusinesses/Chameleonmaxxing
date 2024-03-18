@@ -491,7 +491,7 @@ class DatabaseManager {
 
       // Check if we have a latest player count and compare.
       if (latestPlayerCount != null) {
-        controller.add(voteNum > latestPlayerCount! - 1);
+        controller.add(voteNum > latestPlayerCount!);
       }
     }).onError((_) {
       controller.add(false); // Handle stream errors or complete the stream
