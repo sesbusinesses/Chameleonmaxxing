@@ -31,16 +31,16 @@ class TitlePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             const Text(
-              'Welcome to Chameleon!',
+              'Chameleonmaxxing!',
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const Icon(
-              Icons.smart_toy,
-              size: 100,
-              color: Colors.green,
+            Image.asset(
+              'assets/images/chameleon.png',
+              width: 300, // Set the width as needed
+              height: 300, // Set the height as needed
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
