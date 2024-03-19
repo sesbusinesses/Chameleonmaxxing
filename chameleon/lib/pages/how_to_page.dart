@@ -7,32 +7,62 @@ class HowToPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('How To Guide'),
+        title: const Text('Game Rules'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: ListView(
           children: const <Widget>[
             Text(
-              'How To Use This App',
+              'How To Play',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 20),
+            Text(
+              '1. Objective: Aim to either uncover the Alien (for Humans) or guess the secret word or image without being exposed as the Alien (for the Alien).',
+              style: TextStyle(fontSize: 18),
             ),
             SizedBox(height: 10),
             Text(
-              '1. Step one: download this app',
+              '2. Starting the Game: A player initiates a game room and becomes the host. Other players join using the provided Code. In the waiting room, players select their desired topic. The game starts once the host initiates it.',
               style: TextStyle(fontSize: 18),
             ),
-            SizedBox(height: 5),
+            SizedBox(height: 10),
             Text(
-              '2. Step two: play',
+              '3. Game Play for All Players: All players, except for the Alien, check the secret word. Decide the starting player; often, the one with the most recent birthday, or choose randomly.',
               style: TextStyle(fontSize: 18),
             ),
-            SizedBox(height: 5),
+            SizedBox(height: 10),
             Text(
-              '3. Step three: have fun',
+              '4. Game Play for Humans: Give a one-word clue that’s related to the secret word without being too revealing. Discuss the clues to deduce who the Alien might be, then cast your votes based on these discussions.',
               style: TextStyle(fontSize: 18),
             ),
-            // Add more steps as needed
+            SizedBox(height: 10),
+            Text(
+              '5. Game Play for the Alien: Blend into the conversation by paying close attention to other players\' clues. Without revealing your lack of knowledge, guess the secret word based on these clues. Remember, do not vote for yourself!',
+              style: TextStyle(fontSize: 18),
+            ),
+            SizedBox(height: 10),
+            Text(
+              '6. Rules: Avoid showing your screen to others or looking at others’ screens. Keep the secret word and your role a mystery.',
+              style: TextStyle(fontSize: 18),
+            ),
+            SizedBox(height: 10),
+            Text(
+              '7. Winning the Game: Humans win by identifying the Alien without leaking the secret word. The Alien wins if they remain undetected or guess the secret word correctly.',
+              style: TextStyle(fontSize: 18),
+            ),
+            SizedBox(height: 10),
+            Text(
+              '8. Scoring: Alien escapes: 2 points for the Alien, none for others. Alien caught but guesses the word: 1 point for the Alien. Alien caught without guessing the word: 2 points for Humans.',
+              style: TextStyle(fontSize: 18),
+            ),
+            SizedBox(height: 10),
+            Text(
+              '9. Tips: For Humans, think creatively with your clues to avoid being obvious. For Aliens, stay composed and pretend to know the secret word.',
+              style: TextStyle(fontSize: 18),
+            ),
+            // Add more rules as needed
           ],
         ),
       ),
