@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import '../models/database_manager.dart';
+import '../widgets/swipe_more.dart';
 import 'end_game_page.dart';
 import 'game_topic_page.dart';
 import 'game_people_page.dart';
@@ -21,6 +23,7 @@ class _GamePageState extends State<GamePage> {
   late StreamSubscription<bool> voteNumSubscription;
   bool isChameleon =
       false; // Initialize a flag to check if the player is the chameleon
+  bool showSwipePrompt = true;
 
   @override
   void initState() {
@@ -55,6 +58,28 @@ class _GamePageState extends State<GamePage> {
     setState(() {}); // Update the UI after checking
   }
 
+  Future<void> _checkFirstVisit() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      showSwipePrompt =
+          (prefs.getBool('hasVisitedWaitingPage') ?? false) == false;
+    });
+  }
+
+  void _hideSwipePrompt() {
+    if (showSwipePrompt) {
+      setState(() {
+        showSwipePrompt = false;
+      });
+      _saveVisitStatus();
+    }
+  }
+
+  Future<void> _saveVisitStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hasVisitedWaitingPage', true);
+  }
+
   @override
   void dispose() {
     voteNumSubscription
@@ -75,17 +100,26 @@ class _GamePageState extends State<GamePage> {
           ChamGuessPage(roomCode: widget.roomCode, playerId: widget.playerId));
     }
     return PopScope(
-      canPop: false,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Game Page'),
-          automaticallyImplyLeading: false,
-        ),
-        body: PageView(
-          scrollDirection: Axis.horizontal,
-          children: pages,
-        ),
-      )
-    );
+        canPop: false,
+        child: Scaffold(
+            body: SafeArea(
+                child: Stack(children: [
+          PageView(
+            scrollDirection: Axis.horizontal,
+            children: pages,
+            onPageChanged: (int page) {
+              if (page == pages.length - 1) {
+                _hideSwipePrompt();
+              }
+            },
+          ),
+          if (showSwipePrompt)
+            const Positioned(
+              bottom: 200,
+              left: 0,
+              right: 0,
+              child: FloatingText(),
+            ),
+        ]))));
   }
 }

@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class FloatingText extends StatefulWidget {
+  const FloatingText({super.key});
+
   @override
   _FloatingTextState createState() => _FloatingTextState();
 }
 
-class _FloatingTextState extends State<FloatingText> with SingleTickerProviderStateMixin {
+class _FloatingTextState extends State<FloatingText>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -48,8 +51,9 @@ class _FloatingTextState extends State<FloatingText> with SingleTickerProviderSt
           offset: Offset(0, offset),
           child: Text(
             letter,
-            style: GoogleFonts.lato( // Change to your desired font
-              color: Colors.grey,
+            style: GoogleFonts.lato(
+              // Change to your desired font
+              color: Colors.black,
               fontSize: 20,
             ),
           ),
@@ -57,7 +61,7 @@ class _FloatingTextState extends State<FloatingText> with SingleTickerProviderSt
       },
       child: Text(
         letter,
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.grey,
         ),
       ),

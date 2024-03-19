@@ -30,7 +30,7 @@ class _WaitingPageState extends State<WaitingPage> {
   late Stream<bool> doesRoomExistStream;
   late StreamSubscription<bool> doesRoomExistSubscription;
   bool showSwipePrompt = true;
-  PageController _pageController = PageController();
+  final PageController _pageController = PageController();
 
   @override
   void initState() {
@@ -55,10 +55,8 @@ class _WaitingPageState extends State<WaitingPage> {
     doesRoomExistSubscription = doesRoomExistStream.listen((doesGameExist) {
       if (!doesGameExist) {
         Navigator.popUntil(context, (route) => route.isFirst);
-        if (widget.isHost) {
-          showMessageWarning(context, 'You successfully deleted the room.');
-        } else {
-          showMessageWarning(context, 'The room no longer exists.');
+        if (!widget.isHost) {
+          showMessage(context, 'The room no longer exists.');
         }
       }
     });
@@ -67,7 +65,8 @@ class _WaitingPageState extends State<WaitingPage> {
   Future<void> _checkFirstVisit() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      showSwipePrompt = (prefs.getBool('hasVisitedWaitingPage') ?? false) == false;
+      showSwipePrompt =
+          (prefs.getBool('hasVisitedWaitingPage') ?? false) == false;
     });
   }
 
@@ -110,12 +109,16 @@ class _WaitingPageState extends State<WaitingPage> {
                 _hideSwipePrompt();
               },
               children: <Widget>[
-                WaitingTopicsPage(roomCode: widget.roomCode, playerId: widget.playerId),
-                WaitingPeoplePage(isHost: widget.isHost, roomCode: widget.roomCode, playerId: widget.playerId),
+                WaitingTopicsPage(
+                    roomCode: widget.roomCode, playerId: widget.playerId),
+                WaitingPeoplePage(
+                    isHost: widget.isHost,
+                    roomCode: widget.roomCode,
+                    playerId: widget.playerId),
               ],
             ),
             if (showSwipePrompt)
-              Positioned(
+              const Positioned(
                 bottom: 200,
                 left: 0,
                 right: 0,

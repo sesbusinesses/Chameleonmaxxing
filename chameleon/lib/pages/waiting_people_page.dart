@@ -54,7 +54,7 @@ class _WaitingPeoplePageState extends State<WaitingPeoplePage> {
                 children: [
                   const Text(
                     'Waiting for Players',
-                    style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   Expanded(
                     child: DisplayGrid(

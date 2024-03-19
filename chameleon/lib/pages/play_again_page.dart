@@ -120,7 +120,7 @@ class _PlayAgainPageState extends State<PlayAgainPage> {
         ),
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(bottom: 40),
+        padding: const EdgeInsets.only(bottom: 10),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           mainAxisSize: MainAxisSize.min,
@@ -129,12 +129,12 @@ class _PlayAgainPageState extends State<PlayAgainPage> {
               text: 'Play Again',
               color: Colors.green,
               onPressed: () {
-                DatabaseManager.votePlayAgain(widget.roomCode,widget.playerId);
+                DatabaseManager.votePlayAgain(widget.roomCode, widget.playerId);
               },
             ),
             const SizedBox(height: 15),
             WideButton(
-              text: 'Exit',
+              text: 'Leave Game',
               color: Colors.red,
               onPressed: () async {
                 bool host = await isPlayerHost;

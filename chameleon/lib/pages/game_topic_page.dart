@@ -38,6 +38,16 @@ class _GameTopicPageState extends State<GameTopicPage> {
                   List<String> words = wordsSnapshot.data!;
                   return Column(
                     children: [
+                      const Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Text(
+                          'Word List',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                       Expanded(child: DisplayGrid(userList: words)),
                       FutureBuilder<bool>(
                         future: DatabaseManager.isPlayerTheChameleon(
@@ -64,18 +74,18 @@ class _GameTopicPageState extends State<GameTopicPage> {
                                         'Loading...'; // Or some placeholder text
                                   }
                                   return Padding(
-                                    padding: const EdgeInsets.only(bottom: 40),
+                                    padding: const EdgeInsets.only(bottom: 10),
                                     child: RevealButton(
-                                        text: 'Hold To Reveal Word',
+                                        text: 'Press To Reveal Word',
                                         revealText: revealText),
                                   );
                                 },
                               );
                             }
                             return Padding(
-                              padding: const EdgeInsets.only(bottom: 40),
+                              padding: const EdgeInsets.only(bottom: 10),
                               child: RevealButton(
-                                  text: 'Hold To Reveal Word',
+                                  text: 'Press To Reveal Word',
                                   revealText: revealText),
                             );
                           } else {

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../widgets/swipe_more.dart';
 import 'play_again_page.dart';
 import 'leaderboard_page.dart';
 import '../models/database_manager.dart';
@@ -26,6 +28,7 @@ class _EndGamePageState extends State<EndGamePage> {
   late Stream<bool> doesRoomExistStream;
   late StreamSubscription<bool> doesRoomExistSubscription;
   bool host = false; // Add the host variable
+  bool showSwipePrompt = true;
 
   @override
   void initState() {
@@ -37,7 +40,8 @@ class _EndGamePageState extends State<EndGamePage> {
     runGameAgainStream = DatabaseManager.streamPlayAgainStatus(widget.roomCode);
     doesRoomExistStream = DatabaseManager.streamDoesRoomExist(widget.roomCode);
 
-    runGameAgainSubscription = runGameAgainStream.listen((List<bool> playersReadyList) {
+    runGameAgainSubscription =
+        runGameAgainStream.listen((List<bool> playersReadyList) {
       final allPlayersReady = playersReadyList.every((isReady) => isReady);
       if (allPlayersReady) {
         // Execute async code inside microtask
@@ -61,16 +65,39 @@ class _EndGamePageState extends State<EndGamePage> {
     doesRoomExistSubscription = doesRoomExistStream.listen((doesGameExist) {
       if (!doesGameExist) {
         Navigator.popUntil(context, (route) => route.isFirst);
-        showMessageWarning(context, 'The room no longer exists.');
+        showMessage(context, 'The room no longer exists');
       }
     });
   }
 
   Future<void> _checkIfHost() async {
-    bool isHost = await DatabaseManager.isHost(widget.roomCode, widget.playerId);
+    bool isHost =
+        await DatabaseManager.isHost(widget.roomCode, widget.playerId);
     setState(() {
       host = isHost; // Set the host status based on the result
     });
+  }
+
+  Future<void> _checkFirstVisit() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      showSwipePrompt =
+          (prefs.getBool('hasVisitedWaitingPage') ?? false) == false;
+    });
+  }
+
+  void _hideSwipePrompt() {
+    if (showSwipePrompt) {
+      setState(() {
+        showSwipePrompt = false;
+      });
+      _saveVisitStatus();
+    }
+  }
+
+  Future<void> _saveVisitStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hasVisitedWaitingPage', true);
   }
 
   @override
@@ -83,19 +110,30 @@ class _EndGamePageState extends State<EndGamePage> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Game Over'),
-          automaticallyImplyLeading: false,
-        ),
-        body: PageView(
-          children: <Widget>[
-            PlayAgainPage(roomCode: widget.roomCode, playerId: widget.playerId),
-            LeaderboardPage(roomCode: widget.roomCode, playerId: widget.playerId),
-          ],
-        ),
-      )
-    );
+        canPop: false,
+        child: Scaffold(
+            body: SafeArea(
+                child: Stack(children: [
+          PageView(
+            children: <Widget>[
+              PlayAgainPage(
+                  roomCode: widget.roomCode, playerId: widget.playerId),
+              LeaderboardPage(
+                  roomCode: widget.roomCode, playerId: widget.playerId),
+            ],
+            onPageChanged: (int index) {
+              if (index == 1) {
+                _hideSwipePrompt();
+              }
+            },
+          ),
+          if (showSwipePrompt)
+            const Positioned(
+              bottom: 200,
+              left: 0,
+              right: 0,
+              child: FloatingText(),
+            ),
+        ]))));
   }
 }

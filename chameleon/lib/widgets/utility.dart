@@ -1,35 +1,16 @@
 import 'package:flutter/material.dart';
+import 'pop_up.dart'; // Make sure this import path is correct
 
-//display Error Messages
-void showMessage(BuildContext context, String message) {
+// Display a message saying Warning
+void showMessage(
+  BuildContext context,
+  String message,
+) {
   showDialog(
     context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('Error'),
-      content: Text(message),
-      actions: <Widget>[
-        TextButton(
-          child: const Text('OK'),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ],
-    ),
-  );
-}
-
-//display message with saying Warning
-void showMessageWarning(BuildContext context, String message) {
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('Warning'),
-      content: Text(message),
-      actions: <Widget>[
-        TextButton(
-          child: const Text('OK'),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ],
+    builder: (BuildContext context) => PopUp(
+      content: message,
+      onOkPress: () => Navigator.of(context).pop(),
     ),
   );
 }

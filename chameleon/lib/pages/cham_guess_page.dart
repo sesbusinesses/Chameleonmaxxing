@@ -17,10 +17,6 @@ class _ChamGuessPageState extends State<ChamGuessPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Guess the Word'),
-        automaticallyImplyLeading: false,
-      ),
       body: FutureBuilder<String?>(
         future: DatabaseManager.fetchRoomTopic(widget.roomCode),
         builder: (context, topicSnapshot) {
@@ -42,6 +38,16 @@ class _ChamGuessPageState extends State<ChamGuessPage> {
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      const Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Text(
+                          'Guess the Word',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                       Expanded(
                         child: SelectableGrid(
                             displayList: words,
@@ -52,7 +58,7 @@ class _ChamGuessPageState extends State<ChamGuessPage> {
                             playerId: widget.playerId),
                       ),
                       const SizedBox(
-                        height: 40,
+                        height: 10,
                       )
                     ],
                   );
