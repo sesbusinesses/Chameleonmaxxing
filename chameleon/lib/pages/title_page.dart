@@ -1,6 +1,7 @@
 import 'package:chameleon/pages/topic_page.dart';
 import '../models/database_manager.dart';
 import 'package:flutter/material.dart';
+import '../widgets/utility.dart';
 import '../widgets/wide_button.dart';
 import 'join_page.dart';
 import 'waiting_page.dart';
@@ -48,20 +49,24 @@ class TitlePage extends StatelessWidget {
                 WideButton(
                   text: 'Create Game',
                   onPressed: () async {
-                    String creatorID = DatabaseManager
-                        .generateCode(); // Generate a creator ID
+                    String creatorID =
+                        DatabaseManager.generateCode(); // Generate a creator ID
                     String username = await DatabaseManager.loadUsername();
-                    String roomCode =
-                        await DatabaseManager.createRoomWithCreator(
-                            creatorID, username); // Create room and add creator
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => WaitingPage(
-                              isHost: true,
-                              roomCode: roomCode,
-                              playerId: creatorID)),
-                    );
+                    if (username.isEmpty) {
+                      showMessage(context, 'Please enter a username');
+                    } else {
+                      String roomCode =
+                          await DatabaseManager.createRoomWithCreator(creatorID,
+                              username); // Create room and add creator
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => WaitingPage(
+                                isHost: true,
+                                roomCode: roomCode,
+                                playerId: creatorID)),
+                      );
+                    }
                   },
                 ),
                 const SizedBox(height: 15),

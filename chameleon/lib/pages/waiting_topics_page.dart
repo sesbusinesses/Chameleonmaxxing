@@ -22,7 +22,7 @@ class WaitingTopicsPage extends StatelessWidget {
             const Text(
               'Choose a Topic',
               style: TextStyle(
-                fontSize: 30,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),

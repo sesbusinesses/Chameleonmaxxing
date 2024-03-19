@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/text_box.dart'; // Adjust the path as per your project structure
+import '../widgets/utility.dart';
 import '../widgets/wide_button.dart'; // Adjust the path as per your project structure
 import 'how_to_page.dart'; // Assume this is your app's How-To Guide page
 
@@ -35,54 +36,61 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false,
-      child:  Scaffold(
-        appBar: AppBar(
-          title: const Text('Profile'),
-          automaticallyImplyLeading: false, // Removes the back button
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Edit Username',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+        canPop: false,
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Profile'),
+            automaticallyImplyLeading: false, // Removes the back button
+          ),
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Edit Username',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  TextBox(
-                    hintText: 'Username',
-                    controller: _usernameController,
-                  ),
-                ],
-              ),
-              WideButton(
-                text: 'How To Play',
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HowToPage()),
-                  );
-                },
-              ),
-            ],
+                    TextBox(
+                      hintText: 'Username',
+                      controller: _usernameController,
+                    ),
+                  ],
+                ),
+                WideButton(
+                  text: 'How To Play',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const HowToPage()),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
-        ),
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.only(bottom: 40.0),
-          child: WideButton(
-            text: 'Save and Exit',
-            color: Colors.red,
-            onPressed: _saveUsernameAndExit,
+          bottomNavigationBar: Padding(
+            padding: const EdgeInsets.only(bottom: 40.0),
+            child: WideButton(
+              text: 'Save and Exit',
+              color: Colors.red,
+              onPressed: () {
+                if (_usernameController.text.length <= 20) {
+                  _saveUsernameAndExit();
+                } else {
+                  showMessage(
+                      context, 'Username must be 20 characters or less');
+                }
+              },
+            ),
           ),
-        ),
-      )
-    );
+        ));
   }
 
   @override

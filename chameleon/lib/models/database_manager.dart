@@ -9,53 +9,58 @@ class DatabaseManager {
   static final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   static Future<void> resetToPlayAgain(String roomCode) async {
-    var roomQuery = await FirebaseFirestore.instance
+    DocumentSnapshot roomSnapshot = await FirebaseFirestore.instance
         .collection('room_code')
-        .where('code', isEqualTo: roomCode)
-        .limit(1)
+        .doc(roomCode)
         .get();
 
-    // Reset specific fields in the room document
-    await FirebaseFirestore.instance.collection('room_code').doc(roomCode).update({
-      'voteNum': FieldValue.delete(),      // Remove the voteNum field
-      'topicWord': FieldValue.delete(),    // Remove the topicWord field
-      'Topic': FieldValue.delete(),        // Remove the Topic field
+    // Check if the room exists and has data
+    if (!roomSnapshot.exists || roomSnapshot.data() == null) {
+      print("Room does not exist.");
+      return; // Exit the function if room does not exist
+    }
+
+    // Proceed to reset the room if it exists
+    await FirebaseFirestore.instance
+        .collection('room_code')
+        .doc(roomCode)
+        .update({
+      'voteNum': FieldValue.delete(), // Remove the voteNum field
+      'topicWord': FieldValue.delete(), // Remove the topicWord field
+      'Topic': FieldValue.delete(), // Remove the Topic field
+      'gameRunning': false, // Set gameRunning to false
       // Add more fields to reset if necessary
     });
 
-    if (roomQuery.docs.isNotEmpty) {
-      var docId = roomQuery.docs.first.id;
-      var players = List.from(roomQuery.docs.first.get('players'));
-      var updatedPlayers = players.map((player) {
-        // Initialize an updatedPlayer variable to hold changes
-        Map updatedPlayer = Map.from(player); 
+    List<dynamic> players = roomSnapshot.get('players');
+    List<dynamic> updatedPlayers = players.map((player) {
+      // Initialize an updatedPlayer variable to hold changes
+      Map updatedPlayer = Map.from(player);
 
-        // Check if the player is the champion and needs chamGuess to be removed
-        if (updatedPlayer['isCham'] == true) {
-          updatedPlayer.remove('chamGuess'); // Remove 'chamGuess' field
-        }
+      // Check if the player is the champion and needs chamGuess to be removed
+      if (updatedPlayer['isCham'] == true) {
+        updatedPlayer.remove('chamGuess'); // Remove 'chamGuess' field
+      }
 
-        // Reset fields for every player
-        updatedPlayer['playAgain'] = false;
-        updatedPlayer['isCham'] = false;
-        updatedPlayer['votingCham'] = "";
-        updatedPlayer['votingTopic'] = "";
-        // Add other fields to reset if necessary
+      // Reset fields for every player
+      updatedPlayer['playAgain'] = false;
+      updatedPlayer['isCham'] = false;
+      updatedPlayer['votingCham'] = "";
+      updatedPlayer['votingTopic'] = "";
+      // Add other fields to reset if necessary
 
-        return updatedPlayer; // Return the updated player information
-      }).toList();
+      return updatedPlayer; // Return the updated player information
+    }).toList();
 
-      await FirebaseFirestore.instance
-          .collection('room_code')
-          .doc(docId)
-          .update({'players': updatedPlayers});
-    }
+    // Update the room document with the reset players' information
+    await FirebaseFirestore.instance
+        .collection('room_code')
+        .doc(roomCode)
+        .update({'players': updatedPlayers});
   }
 
-
-
   static String generateCode() {
-    const String chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const String chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     Random rnd = Random();
     return String.fromCharCodes(Iterable.generate(
         5, (_) => chars.codeUnitAt(rnd.nextInt(chars.length))));
@@ -179,7 +184,6 @@ class DatabaseManager {
       },
     );
   }
-
 
   static Stream<bool> streamGameRunning(String roomCode) {
     return _db.collection('room_code').doc(roomCode).snapshots().map(
@@ -699,7 +703,6 @@ class DatabaseManager {
       await _db.runTransaction((transaction) async {
         transaction.update(roomRef, {
           'players': updatedPlayers,
-          'gameRunning' : false,
           'voteNum': 0, // Reset vote count or any other game state as needed
         });
       });
@@ -732,7 +735,7 @@ class DatabaseManager {
 
       // Check if we have a latest player count and compare.
       if (latestPlayerCount != null) {
-        controller.add(voteNum > latestPlayerCount!-1);
+        controller.add(voteNum > latestPlayerCount! - 1);
       }
     }).onError((_) {
       controller.add(false); // Handle stream errors or complete the stream
@@ -831,27 +834,56 @@ class DatabaseManager {
 
   static Future<List<PlayerScore>> getLeaderboardScores(String roomCode) async {
     try {
-      // Adjusted to query a subcollection 'players' within a specific room document
-      QuerySnapshot querySnapshot = await _db
-          .collection('rooms')
-          .doc(roomCode)
-          .collection('players')
-          .orderBy('score',
-              descending:
-                  true) // Assuming 'score' is a field within each player document
-          .get();
+      // Fetch the room document by its roomCode
+      DocumentSnapshot roomDoc =
+          await _db.collection('room_code').doc(roomCode).get();
 
-      List<PlayerScore> scores = querySnapshot.docs.map((doc) {
-        return PlayerScore(
-          playerName: doc['username'], // Adjust field name as per your database
-          score: doc['score'], // Adjust field name as per your database
-        );
-      }).toList();
+      if (roomDoc.exists && roomDoc.data() != null) {
+        Map<String, dynamic> roomData = roomDoc.data() as Map<String, dynamic>;
+        List<dynamic> players = roomData['players'];
 
-      return scores;
+        // Sort players by their score in descending order
+        players.sort((a, b) => (b['score'] ?? 0).compareTo(a['score'] ?? 0));
+
+        // Map each player to a PlayerScore object
+        List<PlayerScore> scores = players.map<PlayerScore>((player) {
+          return PlayerScore(
+            playerName:
+                player['username'], // Adjust field name as per your database
+            score: player['score'], // Adjust field name as per your database
+          );
+        }).toList();
+
+        return scores;
+      }
     } catch (e) {
       print("Error fetching leaderboard scores for room $roomCode: $e");
       return []; // Return an empty list in case of error
     }
+    return []; // Return an empty list if the room document does not exist or has no data
+  }
+
+  static Future<bool> checkUsernameInRoom(
+      String roomCode, String username) async {
+    try {
+      // Fetch the room document by roomCode
+      DocumentSnapshot roomDoc =
+          await _db.collection('room_code').doc(roomCode).get();
+
+      if (roomDoc.exists && roomDoc.data() != null) {
+        // Extract players list from room document
+        List<dynamic> players = roomDoc.get('players');
+
+        // Check if any player in the list has the provided username
+        for (var player in players) {
+          if (player['username'] == username) {
+            return true; // Username exists in the room
+          }
+        }
+      }
+    } catch (e) {
+      print("Error checking username in room: $e");
+    }
+    return false; // Username does not exist in the room or an error occurred
   }
 }
