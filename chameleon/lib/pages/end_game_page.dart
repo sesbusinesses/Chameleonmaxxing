@@ -22,13 +22,14 @@ class EndGamePage extends StatefulWidget {
   _EndGamePageState createState() => _EndGamePageState();
 }
 
-class _EndGamePageState extends State<EndGamePage> {
+class _EndGamePageState extends State<EndGamePage> with WidgetsBindingObserver{
   late Stream<List<bool>> runGameAgainStream;
   late StreamSubscription<List<bool>> runGameAgainSubscription;
   late Stream<bool> doesRoomExistStream;
   late StreamSubscription<bool> doesRoomExistSubscription;
   bool host = false; // Add the host variable
   bool showSwipePrompt = true;
+  Timer? _kickoutTimer; // Timer for kicking out the player
 
   @override
   void initState() {
@@ -39,6 +40,7 @@ class _EndGamePageState extends State<EndGamePage> {
 
     runGameAgainStream = DatabaseManager.streamPlayAgainStatus(widget.roomCode);
     doesRoomExistStream = DatabaseManager.streamDoesRoomExist(widget.roomCode);
+    WidgetsBinding.instance.addObserver(this);
 
     runGameAgainSubscription =
         runGameAgainStream.listen((List<bool> playersReadyList) {
@@ -102,9 +104,29 @@ class _EndGamePageState extends State<EndGamePage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     runGameAgainSubscription.cancel();
     doesRoomExistSubscription.cancel();
+    _kickoutTimer?.cancel(); // Cancel the timer if it's active
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+      // Start a timer to remove the player if they don't return in time
+      print("timer started");
+      _kickoutTimer = Timer(Duration(minutes: 1), () {
+        print("you are kicked out");
+        DatabaseManager.removePlayerFromRoom(widget.roomCode, widget.playerId);
+        Navigator.popUntil(context, (route) => route.isFirst);
+      });
+    } else if (state == AppLifecycleState.resumed) {
+      // Cancel the timer if the player returns to the app
+      _kickoutTimer?.cancel();
+      print("timer canceled");
+    }
   }
 
   @override

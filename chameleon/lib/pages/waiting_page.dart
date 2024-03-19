@@ -24,19 +24,21 @@ class WaitingPage extends StatefulWidget {
   State<WaitingPage> createState() => _WaitingPageState();
 }
 
-class _WaitingPageState extends State<WaitingPage> {
+class _WaitingPageState extends State<WaitingPage> with WidgetsBindingObserver{
   late Stream<bool> gameRunningStream;
   late StreamSubscription<bool> gameRunningSubscription;
   late Stream<bool> doesRoomExistStream;
   late StreamSubscription<bool> doesRoomExistSubscription;
   bool showSwipePrompt = true;
   final PageController _pageController = PageController();
+  Timer? _kickoutTimer; // Timer for kicking out the player
 
   @override
   void initState() {
     super.initState();
     gameRunningStream = DatabaseManager.streamGameRunning(widget.roomCode);
     doesRoomExistStream = DatabaseManager.streamDoesRoomExist(widget.roomCode);
+    WidgetsBinding.instance.addObserver(this);
 
     gameRunningSubscription = gameRunningStream.listen((isGameRunning) {
       if (isGameRunning) {
@@ -86,9 +88,29 @@ class _WaitingPageState extends State<WaitingPage> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     gameRunningSubscription.cancel();
     doesRoomExistSubscription.cancel();
+    _kickoutTimer?.cancel(); // Cancel the timer if it's active
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+      // Start a timer to remove the player if they don't return in time
+      print("timer started");
+      _kickoutTimer = Timer(Duration(minutes: 1), () {
+        print("you are kicked out");
+        DatabaseManager.removePlayerFromRoom(widget.roomCode, widget.playerId);
+        Navigator.popUntil(context, (route) => route.isFirst);
+      });
+    } else if (state == AppLifecycleState.resumed) {
+      // Cancel the timer if the player returns to the app
+      _kickoutTimer?.cancel();
+      print("timer canceled");
+    }
   }
 
   @override

@@ -18,17 +18,19 @@ class GamePage extends StatefulWidget {
   State<GamePage> createState() => _GamePageState();
 }
 
-class _GamePageState extends State<GamePage> {
+class _GamePageState extends State<GamePage> with WidgetsBindingObserver{
   late Stream<bool> voteNumStream;
   late StreamSubscription<bool> voteNumSubscription;
   bool isChameleon =
       false; // Initialize a flag to check if the player is the chameleon
   bool showSwipePrompt = true;
+  Timer? _kickoutTimer; // Timer for kicking out the player
 
   @override
   void initState() {
     super.initState();
     voteNumStream = DatabaseManager.getVoteNumStream(widget.roomCode);
+    WidgetsBinding.instance.addObserver(this);
 
     // Listen for changes in the voteNum to determine when to navigate to the EndGamePage.
     voteNumSubscription = voteNumStream.listen((voteNum) async {
@@ -82,9 +84,28 @@ class _GamePageState extends State<GamePage> {
 
   @override
   void dispose() {
-    voteNumSubscription
-        .cancel(); // Make sure to cancel the subscription on dispose
+    WidgetsBinding.instance.removeObserver(this);
+    voteNumSubscription.cancel(); // Make sure to cancel the subscription on dispose
+    _kickoutTimer?.cancel(); // Cancel the timer if it's active
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+      // Start a timer to remove the player if they don't return in time
+      print("timer started");
+      _kickoutTimer = Timer(Duration(minutes: 1), () {
+        print("you are kicked out");
+        DatabaseManager.removePlayerFromRoom(widget.roomCode, widget.playerId);
+        Navigator.popUntil(context, (route) => route.isFirst);
+      });
+    } else if (state == AppLifecycleState.resumed) {
+      // Cancel the timer if the player returns to the app
+      _kickoutTimer?.cancel();
+      print("timer canceled");
+    }
   }
 
   @override
