@@ -52,11 +52,11 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                           PlayerScore score = entry.value;
                           Color? backgroundColor;
                           if (index == 0) {
-                            backgroundColor = Color(0xFFffb703);
+                            backgroundColor = const Color(0xFFffb703);
                           } else if (index == 1) {
-                            backgroundColor = Color(0xFFccc5b9);
+                            backgroundColor = const Color(0xFFccc5b9);
                           } else if (index == 2) {
-                            backgroundColor = Color(0xFFd4a373);
+                            backgroundColor = const Color(0xFFd4a373);
                           }
                           List<Widget> widgets = [
                             Container(
@@ -76,7 +76,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                             widgets.add(const Divider());
                           }
                           return Column(children: widgets);
-                        }).toList(),
+                        }),
                       ],
                     ),
                   ),

@@ -89,7 +89,6 @@ class DatabaseManager {
     return roomCode;
   }
 
-
   static Future<void> addPlayerToRoom(
       String roomCode, String playerId, String username) async {
     Map<String, dynamic> playerDetail = {
@@ -618,8 +617,6 @@ class DatabaseManager {
     return false; // Default return false if unable to determine or on error
   }
 
-  
-
   static Future<String?> getChameleonUsername(String roomCode) async {
     try {
       // Fetch the room document by roomCode
@@ -642,93 +639,89 @@ class DatabaseManager {
   }
 
   static Future<bool> isThereTie(String roomCode) async {
-  try {
-    // Fetch the room document by roomCode
-    DocumentSnapshot roomDoc =
-        await _db.collection('room_code').doc(roomCode).get();
+    try {
+      // Fetch the room document by roomCode
+      DocumentSnapshot roomDoc =
+          await _db.collection('room_code').doc(roomCode).get();
 
-    if (roomDoc.exists && roomDoc.data() != null) {
-      Map<String, dynamic> roomData = roomDoc.data() as Map<String, dynamic>;
-      List<dynamic> players = roomData['players'];
+      if (roomDoc.exists && roomDoc.data() != null) {
+        Map<String, dynamic> roomData = roomDoc.data() as Map<String, dynamic>;
+        List<dynamic> players = roomData['players'];
 
-      // Count votes for each player
-      Map<String, int> voteCounts = {};
-      for (var player in players) {
-        String votedFor = player['votingCham'] ?? '';
-        if (votedFor.isNotEmpty) {
-          voteCounts[votedFor] = (voteCounts[votedFor] ?? 0) + 1;
+        // Count votes for each player
+        Map<String, int> voteCounts = {};
+        for (var player in players) {
+          String votedFor = player['votingCham'] ?? '';
+          if (votedFor.isNotEmpty) {
+            voteCounts[votedFor] = (voteCounts[votedFor] ?? 0) + 1;
+          }
         }
+
+        // Find the highest vote count
+        int highestVoteCount = 0;
+        if (voteCounts.isNotEmpty) {
+          highestVoteCount = voteCounts.values.reduce((a, b) => a > b ? a : b);
+        }
+
+        // Count how many players received the highest vote count
+        int numPlayersWithHighestVotes =
+            voteCounts.values.where((v) => v == highestVoteCount).length;
+
+        // If there is more than one player with the highest votes, then it's a tie
+        return numPlayersWithHighestVotes > 1;
       }
-
-      // Find the highest vote count
-      int highestVoteCount = 0;
-      if (voteCounts.isNotEmpty) {
-        highestVoteCount = voteCounts.values.reduce((a, b) => a > b ? a : b);
-      }
-
-      // Count how many players received the highest vote count
-      int numPlayersWithHighestVotes = voteCounts.values.where((v) => v == highestVoteCount).length;
-
-      // If there is more than one player with the highest votes, then it's a tie
-      return numPlayersWithHighestVotes > 1;
+    } catch (e) {
+      // Error handling can be more specific based on requirements
     }
-  } catch (e) {
-    // Error handling can be more specific based on requirements
-  }
-  return false; // Return false if unable to determine or on error
+    return false; // Return false if unable to determine or on error
   }
 
   static Future<void> resetVoteNum(String roomCode) async {
-  try {
-    DocumentReference roomRef = _db.collection('room_code').doc(roomCode);
-    // Fetch the room document by roomCode to check if it exists
-    DocumentSnapshot roomDoc = await roomRef.get();
+    try {
+      DocumentReference roomRef = _db.collection('room_code').doc(roomCode);
+      // Fetch the room document by roomCode to check if it exists
+      DocumentSnapshot roomDoc = await roomRef.get();
 
-    if (roomDoc.exists) {
-      // Only update the voteNum to 0 if the room document exists
-      await roomRef.update({'voteNum': 0});
+      if (roomDoc.exists) {
+        // Only update the voteNum to 0 if the room document exists
+        await roomRef.update({'voteNum': 0});
+      }
+    } catch (e) {
+      // Handle any errors that occur during the update
+      // Or use a more sophisticated error handling approach
     }
-  } catch (e) {
-    // Handle any errors that occur during the update
-    print(e); // Or use a more sophisticated error handling approach
   }
-  }
-
 
   static Future<void> resetToRevote(String roomCode) async {
-  DocumentSnapshot roomSnapshot = await FirebaseFirestore.instance
-      .collection('room_code')
-      .doc(roomCode)
-      .get();
+    DocumentSnapshot roomSnapshot = await FirebaseFirestore.instance
+        .collection('room_code')
+        .doc(roomCode)
+        .get();
 
-  // Check if the room exists and has data
-  if (!roomSnapshot.exists || roomSnapshot.data() == null) {
-    return; // Exit the function if the room does not exist
-  }
+    // Check if the room exists and has data
+    if (!roomSnapshot.exists || roomSnapshot.data() == null) {
+      return; // Exit the function if the room does not exist
+    }
 
-  List<dynamic> players = roomSnapshot.get('players');
-  List<dynamic> updatedPlayers = players.map((player) {
-    Map<String, dynamic> updatedPlayer = Map<String, dynamic>.from(player);
-    // Reset 'votingCham' for every player
-    updatedPlayer['votingCham'] = "";
-    // Check if the player is the champion and needs chamGuess to be removed
+    List<dynamic> players = roomSnapshot.get('players');
+    List<dynamic> updatedPlayers = players.map((player) {
+      Map<String, dynamic> updatedPlayer = Map<String, dynamic>.from(player);
+      // Reset 'votingCham' for every player
+      updatedPlayer['votingCham'] = "";
+      // Check if the player is the champion and needs chamGuess to be removed
       if (updatedPlayer['isCham'] == true) {
         updatedPlayer.remove('chamGuess'); // Remove 'chamGuess' field
       }
 
+      return updatedPlayer; // Return the updated player information
+    }).toList();
 
-    return updatedPlayer; // Return the updated player information
-  }).toList();
-
-  // Update the room with the reset players
-  await FirebaseFirestore.instance
-      .collection('room_code')
-      .doc(roomCode)
-      .update({'players': updatedPlayers});
+    // Update the room with the reset players
+    await FirebaseFirestore.instance
+        .collection('room_code')
+        .doc(roomCode)
+        .update({'players': updatedPlayers});
   }
-
-
-
 
   static Future<void> endGame(String roomCode) async {
     try {

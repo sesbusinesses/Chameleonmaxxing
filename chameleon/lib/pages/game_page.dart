@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
@@ -41,9 +43,9 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
       // Make this callback async
       if (voteNum) {
         bool voteTie = await DatabaseManager.isThereTie(widget.roomCode);
-        if(voteTie != true){
+        if (voteTie != true) {
           await DatabaseManager.endGame(
-            widget.roomCode); // Wait for endGame to complete
+              widget.roomCode); // Wait for endGame to complete
           if (mounted) {
             // Check if the widget is still in the widget tree
             Navigator.pushReplacement(
@@ -53,15 +55,17 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
                       roomCode: widget.roomCode, playerId: widget.playerId)),
             );
           }
-        }
-        else{
+        } else {
           DatabaseManager.resetVoteNum(widget.roomCode);
           DatabaseManager.resetToRevote(widget.roomCode);
-          print("reseted");
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => GamePage(roomCode: widget.roomCode, playerId: widget.playerId)));
-          showMessage(context, 'It seems like humans are not sure who the alien is. Everyone give another clue.');
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => GamePage(
+                      roomCode: widget.roomCode, playerId: widget.playerId)));
+          showMessage(context,
+              'It seems like humans are not sure who the alien is. Everyone give another clue.');
         }
-        
       }
     });
 
