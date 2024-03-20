@@ -34,6 +34,63 @@ class _CardListState extends State<CardList> {
     super.dispose();
   }
 
+  void _showAddTopicCardDialog(BuildContext context) {
+    // Controllers for text fields
+    TextEditingController topicController = TextEditingController();
+    List<TextEditingController> wordControllers =
+        List.generate(10, (_) => TextEditingController());
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add New Topic'),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              TextField(
+                controller: topicController,
+                decoration: const InputDecoration(hintText: 'Topic Name'),
+              ),
+              ...List.generate(
+                  10,
+                  (index) => TextField(
+                        controller: wordControllers[index],
+                        decoration:
+                            InputDecoration(hintText: 'Word ${index + 1}'),
+                      )),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          TextButton(
+            child: const Text('Add'),
+            onPressed: () {
+              // Prepare data for the new TopicCard
+              String topicName = topicController.text;
+              List<String> wordList =
+                  wordControllers.map((controller) => controller.text).toList();
+              int defaultColor = 0xFFFFE8D6;
+              TopicCard newCard = TopicCard(
+                  words: topicName, color: defaultColor, wordList: wordList);
+
+              // Call addTopicCard method
+              addTopicCard(newCard).then((_) {
+                Navigator.of(context).pop(); // Close the dialog
+                setState(() {
+                  futureTopicCards = fetchTopicCards(); // Refresh the list
+                });
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -144,17 +201,17 @@ class _CardListState extends State<CardList> {
                             );
                           } else if (index == topicCards.length) {
                             // Button for adding a new topic card, with space before it
-                            return const Padding(
-                              padding: EdgeInsets.only(
+                            return Padding(
+                              padding: const EdgeInsets.only(
                                   top: 20.0), // Adjust the padding as needed
-                              // child: Center(
-                              //   child: IconButton(
-                              //     icon: const Icon(Icons.add_circle_outline,
-                              //         size: 50),
-                              //     onPressed: () =>
-                              //         _showAddTopicCardDialog(context),
-                              //   ),
-                              // ),
+                              child: Center(
+                                child: IconButton(
+                                  icon: const Icon(Icons.add_circle_outline,
+                                      size: 50),
+                                  onPressed: () =>
+                                      _showAddTopicCardDialog(context),
+                                ),
+                              ),
                             );
                           }
                           return null;
@@ -180,7 +237,3 @@ class _CardListState extends State<CardList> {
 
 
 // Assuming fetchTopicCards() is defined elsewhere and returns Future<List<TopicCard>>
-
-
-
-
