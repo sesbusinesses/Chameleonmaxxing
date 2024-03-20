@@ -80,7 +80,7 @@ class _WaitingPeoplePageState extends State<WaitingPeoplePage> {
                       ),
                     ),
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 40),
+                    padding: const EdgeInsets.only(bottom: 20),
                     child: WideButton(
                       text: 'Leave Game',
                       color: Colors.red,
