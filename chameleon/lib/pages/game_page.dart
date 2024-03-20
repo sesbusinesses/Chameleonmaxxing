@@ -22,6 +22,8 @@ class GamePage extends StatefulWidget {
 class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
   late Stream<bool> voteNumStream;
   late StreamSubscription<bool> voteNumSubscription;
+  late Stream<bool> doesRoomExistStream;
+  late StreamSubscription<bool> doesRoomExistSubscription;
   bool isChameleon =
       false; // Initialize a flag to check if the player is the chameleon
   bool showSwipePrompt = true;
@@ -31,6 +33,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     voteNumStream = DatabaseManager.getVoteNumStream(widget.roomCode);
+    doesRoomExistStream = DatabaseManager.streamDoesRoomExist(widget.roomCode);
     WidgetsBinding.instance.addObserver(this);
 
     // Listen for changes in the voteNum to determine when to navigate to the EndGamePage.
@@ -64,6 +67,13 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
 
     // Immediately check if the current player is the chameleon and update the isChameleon flag accordingly.
     _checkIfChameleon();
+
+    doesRoomExistSubscription = doesRoomExistStream.listen((doesGameExist) {
+      if (!doesGameExist) {
+        Navigator.popUntil(context, (route) => route.isFirst);
+        showMessage(context, 'The room no longer exists');
+      }
+    });
   }
 
   Future<void> _checkIfChameleon() async {
