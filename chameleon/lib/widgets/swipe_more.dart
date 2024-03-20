@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -31,14 +32,25 @@ class FloatingTextState extends State<FloatingText>
   @override
   Widget build(BuildContext context) {
     String text = "Swipe to see more →";
-    return Center(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: text
-            .split('')
-            .map((letter) => _buildAnimatedLetter(letter))
-            .toList(),
-      ),
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Positioned.fill(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+            child: Container(
+              color: Colors.black.withOpacity(0),
+            ),
+          ),
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: text
+              .split('')
+              .map((letter) => _buildAnimatedLetter(letter))
+              .toList(),
+        ),
+      ],
     );
   }
 
@@ -52,7 +64,6 @@ class FloatingTextState extends State<FloatingText>
           child: Text(
             letter,
             style: GoogleFonts.lato(
-              // Change to your desired font
               color: Colors.black,
               fontSize: 30,
               fontWeight: FontWeight.bold,
@@ -69,3 +80,4 @@ class FloatingTextState extends State<FloatingText>
     );
   }
 }
+
