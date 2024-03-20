@@ -18,17 +18,23 @@ class TopicCard {
 
 final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-// Assume a global accessible Firestore instance
+
+// Define the colors you want to cycle through
+final List<int> cycleColors = [0xFFE3ECFF, 0xFFFFE8D6, 0xFFCEF2FA]; // Red, Blue, Green
+
 Future<List<TopicCard>> fetchTopicCards() async {
   try {
     QuerySnapshot snapshot = await _firestore.collection('card_topics').get();
+    int colorIndex = 0; // This will help in cycling through colors
     List<TopicCard> topicCards = snapshot.docs.map((doc) {
       Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-      // Check if 'wordList' exists and is not null, otherwise provide an empty list as default
       List<String> wordList =
           data['wordList'] != null ? List<String>.from(data['wordList']) : [];
-      // Similarly, provide default values for color and imagePath if they are null
-      int color = data['color'] ?? 0xFFFFE8D6; // Default
+
+      // Assign a color from cycleColors based on the current index, then increment the index
+      int color = cycleColors[colorIndex % cycleColors.length];
+      colorIndex++; // Move to the next color for the next card
+
       String? imagePath = data['imagePath'];
       return TopicCard(
         words: doc.id,
