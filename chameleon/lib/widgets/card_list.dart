@@ -109,6 +109,7 @@ class _CardListState extends State<CardList> {
                       title: Text('Topics'),
                       pinned: true,
                       backgroundColor: Colors.transparent,
+                      surfaceTintColor: Colors.transparent,
                     ),
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
@@ -204,7 +205,7 @@ class _CardListState extends State<CardList> {
                             return Padding(
                               padding: const EdgeInsets.only(
                                   top: 20.0), // Adjust the padding as needed
-                                  /*
+                              /*
                                child: Center(
                                  child: IconButton(
                                    icon: const Icon(Icons.add_circle_outline,
