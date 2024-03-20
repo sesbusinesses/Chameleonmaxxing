@@ -59,7 +59,7 @@ class GameTopicPageState extends State<GameTopicPage> {
                             String revealText;
                             if (isChameleonSnapshot.hasData &&
                                 isChameleonSnapshot.data!) {
-                              revealText = 'You are the Chameleon!';
+                              revealText = 'You are the Alien!';
                             } else {
                               // Fetch the topic word if the player is not the chameleon
                               return FutureBuilder<String?>(
