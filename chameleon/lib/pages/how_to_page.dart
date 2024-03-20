@@ -29,12 +29,12 @@ class HowToPage extends StatelessWidget {
             ),
             SizedBox(height: 10),
             Text(
-              '3. Game Play for All Players \n All players, except for the Alien, check the secret word. Decide the starting player; often, the one with the most recent birthday, or choose randomly.',
+              '3. Game Play for All Players \n All players, except for the Alien, check the secret word. Decide the starting player and everyone take turn to give a clue about the secret word.',
               style: TextStyle(fontSize: 18),
             ),
             SizedBox(height: 10),
             Text(
-              '4. Game Play for Humans \n Give a one-word clue that’s related to the secret word without being too revealing. Discuss the clues to deduce who the Alien might be, then cast your votes based on these discussions.',
+              '4. Game Play for Humans \n Give a clue that’s related to the secret word without being too revealing. Discuss the clues to deduce who the Alien might be, then cast your votes based on these discussions.',
               style: TextStyle(fontSize: 18),
             ),
             SizedBox(height: 10),
