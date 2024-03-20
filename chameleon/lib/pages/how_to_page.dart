@@ -54,7 +54,7 @@ class HowToPage extends StatelessWidget {
             ),
             SizedBox(height: 10),
             Text(
-              '8. Scoring: Alien escapes \n 2 points for the Alien, none for others. Alien caught but guesses the word: 1 point for the Alien. Alien caught without guessing the word: 2 points for Humans.',
+              '8. Scoring \n Alien escapes 2 points for the Alien, none for others. Alien caught but guesses the word: 1 point for the Alien. Alien caught without guessing the word: 2 points for Humans.',
               style: TextStyle(fontSize: 18),
             ),
             SizedBox(height: 10),
