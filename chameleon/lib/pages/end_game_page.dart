@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/swipe_more.dart';
@@ -19,10 +21,10 @@ class EndGamePage extends StatefulWidget {
   });
 
   @override
-  _EndGamePageState createState() => _EndGamePageState();
+  EndGamePageState createState() => EndGamePageState();
 }
 
-class _EndGamePageState extends State<EndGamePage> with WidgetsBindingObserver{
+class EndGamePageState extends State<EndGamePage> with WidgetsBindingObserver {
   late Stream<List<bool>> runGameAgainStream;
   late StreamSubscription<List<bool>> runGameAgainSubscription;
   late Stream<bool> doesRoomExistStream;
@@ -80,14 +82,6 @@ class _EndGamePageState extends State<EndGamePage> with WidgetsBindingObserver{
     });
   }
 
-  Future<void> _checkFirstVisit() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      showSwipePrompt =
-          (prefs.getBool('hasVisitedWaitingPage') ?? false) == false;
-    });
-  }
-
   void _hideSwipePrompt() {
     if (showSwipePrompt) {
       setState(() {
@@ -114,18 +108,16 @@ class _EndGamePageState extends State<EndGamePage> with WidgetsBindingObserver{
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
       // Start a timer to remove the player if they don't return in time
-      print("timer started");
-      _kickoutTimer = Timer(Duration(minutes: 1), () {
-        print("you are kicked out");
+      _kickoutTimer = Timer(const Duration(minutes: 1), () {
         DatabaseManager.removePlayerFromRoom(widget.roomCode, widget.playerId);
         Navigator.popUntil(context, (route) => route.isFirst);
       });
     } else if (state == AppLifecycleState.resumed) {
       // Cancel the timer if the player returns to the app
       _kickoutTimer?.cancel();
-      print("timer canceled");
     }
   }
 

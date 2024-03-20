@@ -7,10 +7,10 @@ class LeaderboardPage extends StatefulWidget {
   final String playerId;
 
   const LeaderboardPage({
-    Key? key,
+    super.key,
     required this.roomCode,
     required this.playerId,
-  }) : super(key: key);
+  });
 
   @override
   State<LeaderboardPage> createState() => _LeaderboardPageState();
@@ -41,11 +41,12 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
               itemBuilder: (context, index) {
                 PlayerScore score = snapshot.data![index];
                 return ListTile(
-                  leading:
-                      Text('#${index + 1}', style: TextStyle(fontSize: 16)),
-                  title: Text(score.playerName, style: TextStyle(fontSize: 16)),
+                  leading: Text('#${index + 1}',
+                      style: const TextStyle(fontSize: 16)),
+                  title: Text(score.playerName,
+                      style: const TextStyle(fontSize: 16)),
                   trailing: Text('${score.score} pts',
-                      style: TextStyle(fontSize: 16)),
+                      style: const TextStyle(fontSize: 16)),
                 );
               },
               separatorBuilder: (context, index) => const Divider(),

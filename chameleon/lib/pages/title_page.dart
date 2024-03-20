@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:chameleon/pages/topic_page.dart';
 import '../models/database_manager.dart';
 import 'package:flutter/material.dart';

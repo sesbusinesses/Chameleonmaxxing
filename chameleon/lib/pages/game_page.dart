@@ -18,7 +18,7 @@ class GamePage extends StatefulWidget {
   State<GamePage> createState() => _GamePageState();
 }
 
-class _GamePageState extends State<GamePage> with WidgetsBindingObserver{
+class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
   late Stream<bool> voteNumStream;
   late StreamSubscription<bool> voteNumSubscription;
   bool isChameleon =
@@ -60,14 +60,6 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver{
     setState(() {}); // Update the UI after checking
   }
 
-  Future<void> _checkFirstVisit() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      showSwipePrompt =
-          (prefs.getBool('hasVisitedWaitingPage') ?? false) == false;
-    });
-  }
-
   void _hideSwipePrompt() {
     if (showSwipePrompt) {
       setState(() {
@@ -85,7 +77,8 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver{
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    voteNumSubscription.cancel(); // Make sure to cancel the subscription on dispose
+    voteNumSubscription
+        .cancel(); // Make sure to cancel the subscription on dispose
     _kickoutTimer?.cancel(); // Cancel the timer if it's active
     super.dispose();
   }
@@ -93,18 +86,16 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver{
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
+    if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached) {
       // Start a timer to remove the player if they don't return in time
-      print("timer started");
-      _kickoutTimer = Timer(Duration(minutes: 1), () {
-        print("you are kicked out");
+      _kickoutTimer = Timer(const Duration(minutes: 1), () {
         DatabaseManager.removePlayerFromRoom(widget.roomCode, widget.playerId);
         Navigator.popUntil(context, (route) => route.isFirst);
       });
     } else if (state == AppLifecycleState.resumed) {
       // Cancel the timer if the player returns to the app
       _kickoutTimer?.cancel();
-      print("timer canceled");
     }
   }
 

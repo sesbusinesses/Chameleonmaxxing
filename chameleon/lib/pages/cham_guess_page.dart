@@ -10,10 +10,10 @@ class ChamGuessPage extends StatefulWidget {
       {super.key, required this.roomCode, required this.playerId});
 
   @override
-  _ChamGuessPageState createState() => _ChamGuessPageState();
+  ChamGuessPageState createState() => ChamGuessPageState();
 }
 
-class _ChamGuessPageState extends State<ChamGuessPage> {
+class ChamGuessPageState extends State<ChamGuessPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

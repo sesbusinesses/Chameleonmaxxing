@@ -1,3 +1,5 @@
+// ignore_for_file: empty_catches
+
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
@@ -16,7 +18,6 @@ class DatabaseManager {
 
     // Check if the room exists and has data
     if (!roomSnapshot.exists || roomSnapshot.data() == null) {
-      print("Room does not exist.");
       return; // Exit the function if room does not exist
     }
 
@@ -260,9 +261,7 @@ class DatabaseManager {
                 player['votingCham'] != null && player['votingCham'] != "")
             .toList();
       }
-    } catch (error) {
-      print('Error getting votingCham status: $error');
-    }
+    } catch (error) {}
     return [];
   }
 
@@ -277,9 +276,7 @@ class DatabaseManager {
                 player['votingTopic'] != null && player['votingTopic'] != "")
             .toList();
       }
-    } catch (error) {
-      print('Error getting votingTopic status: $error');
-    }
+    } catch (error) {}
     return [];
   }
 
@@ -292,7 +289,6 @@ class DatabaseManager {
           .toList(); // Assuming the document ID is the topic name
       return topics;
     } catch (e) {
-      print("Error fetching topics: $e");
       return []; // Return empty list on error
     }
   }
@@ -356,9 +352,7 @@ class DatabaseManager {
           'voteNum': 0,
         });
       }
-    } catch (e) {
-      print("Error starting game: $e");
-    }
+    } catch (e) {}
   }
 
   // Fetches the initial selection based on the updateField for a given player
@@ -377,9 +371,7 @@ class DatabaseManager {
               updateField]; // This will be either a String or null
         }
       }
-    } catch (e) {
-      print("Error fetching initial selection: $e");
-    }
+    } catch (e) {}
     return null;
   }
 
@@ -402,9 +394,7 @@ class DatabaseManager {
             .doc(roomCode)
             .update({'players': updatedPlayers});
       }
-    } catch (e) {
-      print("Error updating player selection: $e");
-    }
+    } catch (e) {}
   }
 
   // Fetches a word list for a specific topic from the 'card_topics' collection
@@ -420,7 +410,6 @@ class DatabaseManager {
         return []; // Return empty list if 'wordList' key doesn't exist or document doesn't exist
       }
     } catch (e) {
-      print("Error fetching word list for topic $topic: $e");
       return []; // Return empty list on error
     }
   }
@@ -439,9 +428,7 @@ class DatabaseManager {
           return roomData['Topic'];
         }
       }
-    } catch (e) {
-      print("Error fetching room topic for roomCode $roomCode: $e");
-    }
+    } catch (e) {}
     return null; // Return null if there's no topic or in case of an error
   }
 
@@ -460,17 +447,14 @@ class DatabaseManager {
           return roomData['topicWord'];
         } else {
           // Handle case where 'topicWord' does not exist or is not a string
-          print("No topicWord found or topicWord is not a string.");
           return null;
         }
       } else {
         // Handle case where room document does not exist
-        print("Room with code $roomCode does not exist.");
         return null;
       }
     } catch (e) {
       // Handle errors such as permission issues, network errors, etc.
-      print("Error fetching topicWord for room $roomCode: $e");
       return null;
     }
   }
@@ -493,9 +477,7 @@ class DatabaseManager {
           }
         }
       }
-    } catch (e) {
-      print("Error checking if player is the chameleon: $e");
-    }
+    } catch (e) {}
     return false; // Return false if player not found or in case of any error
   }
 
@@ -526,8 +508,8 @@ class DatabaseManager {
 
     // Start listening to the player count updates.
     // You may want to handle this more robustly in a real app, e.g., refreshing periodically.
-    countPlayersInRoom(roomCode).then((count) {
-      latestPlayerCount = count;
+    countPlayersInRoom(roomCode).then((count1) {
+      latestPlayerCount = count1;
     }).catchError((_) {
       latestPlayerCount = 0; // Handle error or maintain old count
     });
@@ -589,9 +571,7 @@ class DatabaseManager {
         // Return the chameleon's playerID if found
         return chameleon != null ? chameleon['playerID'] : null;
       }
-    } catch (e) {
-      print("Error getting chameleon player ID: $e");
-    }
+    } catch (e) {}
     return null; // Return null if not found or on error
   }
 
@@ -633,9 +613,7 @@ class DatabaseManager {
             .key;
         return chameleonUsername == mostVotedFor;
       }
-    } catch (e) {
-      print("Error checking if chameleon was caught: $e");
-    }
+    } catch (e) {}
     return false; // Default return false if unable to determine or on error
   }
 
@@ -656,9 +634,7 @@ class DatabaseManager {
           }
         }
       }
-    } catch (e) {
-      print("Error fetching chameleon's username: $e");
-    }
+    } catch (e) {}
     return null; // Return null if chameleon's username couldn't be found or on error
   }
 
@@ -668,7 +644,6 @@ class DatabaseManager {
       DocumentSnapshot roomSnapshot = await roomRef.get();
 
       if (!roomSnapshot.exists || roomSnapshot.data() == null) {
-        print("Room does not exist.");
         return;
       }
 
@@ -706,9 +681,7 @@ class DatabaseManager {
           'voteNum': 0, // Reset vote count or any other game state as needed
         });
       });
-    } catch (e) {
-      print("Error ending game: $e");
-    }
+    } catch (e) {}
   }
 
   static Stream<bool> getPlayAgainNumStream(String roomCode) {
@@ -719,8 +692,8 @@ class DatabaseManager {
 
     // Start listening to the player count updates.
     // You may want to handle this more robustly in a real app, e.g., refreshing periodically.
-    countPlayersInRoom(roomCode).then((count) {
-      latestPlayerCount = count;
+    countPlayersInRoom(roomCode).then((count2) {
+      latestPlayerCount = count2;
     }).catchError((_) {
       latestPlayerCount = 0; // Handle error or maintain old count
     });
@@ -764,9 +737,7 @@ class DatabaseManager {
           return player['isHost'] ?? false;
         }
       }
-    } catch (e) {
-      print("Error checking if player is the host: $e");
-    }
+    } catch (e) {}
     return false; // Return false if the player is not found, or in case of any error
   }
 
@@ -790,9 +761,7 @@ class DatabaseManager {
           return player['score'] ?? 0; // Default to 0 if 'score' is not set
         }
       }
-    } catch (e) {
-      print("Error retrieving player score: $e");
-    }
+    } catch (e) {}
     return 0; // Return 0 if the player is not found, or in case of any error
   }
 
@@ -821,9 +790,7 @@ class DatabaseManager {
         // Update the room document with the modified players array
         await roomRef.update({'players': updatedPlayers});
       }
-    } catch (e) {
-      print("Error setting votePlayAgain: $e");
-    }
+    } catch (e) {}
   }
 
   static Future<String> loadUsername() async {
@@ -857,7 +824,6 @@ class DatabaseManager {
         return scores;
       }
     } catch (e) {
-      print("Error fetching leaderboard scores for room $roomCode: $e");
       return []; // Return an empty list in case of error
     }
     return []; // Return an empty list if the room document does not exist or has no data
@@ -881,9 +847,7 @@ class DatabaseManager {
           }
         }
       }
-    } catch (e) {
-      print("Error checking username in room: $e");
-    }
+    } catch (e) {}
     return false; // Username does not exist in the room or an error occurred
   }
 }

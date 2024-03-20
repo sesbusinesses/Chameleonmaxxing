@@ -6,10 +6,10 @@ class FloatingText extends StatefulWidget {
   const FloatingText({super.key});
 
   @override
-  _FloatingTextState createState() => _FloatingTextState();
+  FloatingTextState createState() => FloatingTextState();
 }
 
-class _FloatingTextState extends State<FloatingText>
+class FloatingTextState extends State<FloatingText>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 

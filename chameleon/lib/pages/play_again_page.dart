@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import '../models/database_manager.dart';
 import '../widgets/display_grid.dart';
@@ -15,10 +17,10 @@ class PlayAgainPage extends StatefulWidget {
   });
 
   @override
-  _PlayAgainPageState createState() => _PlayAgainPageState();
+  PlayAgainPageState createState() => PlayAgainPageState();
 }
 
-class _PlayAgainPageState extends State<PlayAgainPage> {
+class PlayAgainPageState extends State<PlayAgainPage> {
   late Future<bool> wasChameleonCaught;
   late Future<int> playerScore;
   late Future<bool> isPlayerHost;

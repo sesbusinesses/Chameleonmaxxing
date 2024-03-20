@@ -1,3 +1,5 @@
+// ignore_for_file: empty_catches
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TopicCard {
@@ -7,12 +9,13 @@ class TopicCard {
   final List<String> wordList;
 
   TopicCard({
-    required this.words, 
+    required this.words,
     this.color,
     this.imagePath,
     required this.wordList,
   });
 }
+
 final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
 // Assume a global accessible Firestore instance
@@ -22,7 +25,8 @@ Future<List<TopicCard>> fetchTopicCards() async {
     List<TopicCard> topicCards = snapshot.docs.map((doc) {
       Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
       // Check if 'wordList' exists and is not null, otherwise provide an empty list as default
-      List<String> wordList = data['wordList'] != null ? List<String>.from(data['wordList']) : [];
+      List<String> wordList =
+          data['wordList'] != null ? List<String>.from(data['wordList']) : [];
       // Similarly, provide default values for color and imagePath if they are null
       int color = data['color'] ?? 0xFFFFE8D6; // Default
       String? imagePath = data['imagePath'];
@@ -35,7 +39,6 @@ Future<List<TopicCard>> fetchTopicCards() async {
     }).toList();
     return topicCards;
   } catch (e) {
-    print("Error fetching topic cards: $e");
     return [];
   }
 }
@@ -48,21 +51,12 @@ Future<void> addTopicCard(TopicCard topicCard) async {
       'imagePath': topicCard.imagePath,
       'wordList': topicCard.wordList,
     });
-    print("Topic card added successfully");
-  } catch (e) {
-    print("Error adding topic card: $e");
-  }
+  } catch (e) {}
 }
 
 Future<void> deleteTopicCard(String topicId) async {
   try {
     // Deleting a document by ID
     await _firestore.collection('card_topics').doc(topicId).delete();
-    print("Topic card deleted successfully");
-  } catch (e) {
-    print("Error deleting topic card: $e");
-  }
+  } catch (e) {}
 }
-
-
-

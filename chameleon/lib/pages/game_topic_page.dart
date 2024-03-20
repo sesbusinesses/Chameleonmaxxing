@@ -11,10 +11,10 @@ class GameTopicPage extends StatefulWidget {
       {super.key, required this.roomCode, required this.playerId});
 
   @override
-  _GameTopicPageState createState() => _GameTopicPageState();
+  GameTopicPageState createState() => GameTopicPageState();
 }
 
-class _GameTopicPageState extends State<GameTopicPage> {
+class GameTopicPageState extends State<GameTopicPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
