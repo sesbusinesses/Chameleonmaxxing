@@ -18,9 +18,13 @@ class TopicCard {
 
 final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-
 // Define the colors you want to cycle through
-final List<int> cycleColors = [0xFFE3ECFF, 0xFFFFE8D6, 0xFFCEF2FA]; // Red, Blue, Green
+final List<int> cycleColors = [
+  0xFF00a5cf,
+  0xFF9fffcb,
+  0xFF25a18e,
+  0xFF7ae582,
+]; // Red, Blue, Green
 
 Future<List<TopicCard>> fetchTopicCards() async {
   try {
