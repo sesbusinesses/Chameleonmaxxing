@@ -46,6 +46,7 @@ class GamePeoplePage extends StatelessWidget {
                     playerId: playerId,
                   ),
                 ),
+                const SizedBox(height: 10),
                 const Padding(
                   padding: EdgeInsets.only(bottom: 10),
                 ),

@@ -49,6 +49,7 @@ class GameTopicPageState extends State<GameTopicPage> {
                         ),
                       ),
                       Expanded(child: DisplayGrid(userList: words)),
+                      const SizedBox(height: 20),
                       FutureBuilder<bool>(
                         future: DatabaseManager.isPlayerTheChameleon(
                             widget.roomCode, widget.playerId),
@@ -93,6 +94,7 @@ class GameTopicPageState extends State<GameTopicPage> {
                           }
                         },
                       ),
+                      const SizedBox(height: 10),
                     ],
                   );
                 } else {

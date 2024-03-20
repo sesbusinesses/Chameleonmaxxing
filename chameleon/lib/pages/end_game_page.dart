@@ -141,6 +141,7 @@ class EndGamePageState extends State<EndGamePage> with WidgetsBindingObserver {
               }
             },
           ),
+          const SizedBox(height: 20),
           if (showSwipePrompt)
             const Positioned(
               bottom: 200,

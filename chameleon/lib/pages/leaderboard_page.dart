@@ -40,13 +40,25 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 PlayerScore score = snapshot.data![index];
-                return ListTile(
-                  leading: Text('#${index + 1}',
-                      style: const TextStyle(fontSize: 16)),
-                  title: Text(score.playerName,
-                      style: const TextStyle(fontSize: 16)),
-                  trailing: Text('${score.score} pts',
-                      style: const TextStyle(fontSize: 16)),
+                Color? backgroundColor; // Optional background color
+                if (index == 0) { // First place
+                  backgroundColor = Color(0xFFffb703);
+                } else if (index == 1) { // Second place
+                  backgroundColor = Color(0xFFccc5b9);
+                } else if (index == 2) { // Third place
+                  backgroundColor = Color(0xFFd4a373);
+                }
+
+                return Container(
+                  color: backgroundColor,
+                  child: ListTile(
+                    leading: Text('#${index + 1}',
+                        style: const TextStyle(fontSize: 16)),
+                    title: Text(score.playerName,
+                        style: const TextStyle(fontSize: 16)),
+                    trailing: Text('${score.score} pts',
+                        style: const TextStyle(fontSize: 16)),
+                  ),
                 );
               },
               separatorBuilder: (context, index) => const Divider(),
