@@ -43,6 +43,7 @@ dependencies:
   shared_preferences: ^2.0.15 
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.9.2
   flutter_test:
     sdk: flutter
 
@@ -52,6 +53,11 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^3.0.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/alienIcon.webp"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
