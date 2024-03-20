@@ -103,8 +103,8 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    voteNumSubscription
-        .cancel(); // Make sure to cancel the subscription on dispose
+    voteNumSubscription.cancel();
+    doesRoomExistSubscription.cancel();
     _kickoutTimer?.cancel(); // Cancel the timer if it's active
     super.dispose();
   }
