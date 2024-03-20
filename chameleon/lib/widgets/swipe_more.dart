@@ -54,7 +54,8 @@ class FloatingTextState extends State<FloatingText>
             style: GoogleFonts.lato(
               // Change to your desired font
               color: Colors.black,
-              fontSize: 20,
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
             ),
           ),
         );

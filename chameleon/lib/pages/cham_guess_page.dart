@@ -58,7 +58,7 @@ class ChamGuessPageState extends State<ChamGuessPage> {
                             playerId: widget.playerId),
                       ),
                       const SizedBox(
-                        height: 20,
+                        height: 8,
                       )
                     ],
                   );

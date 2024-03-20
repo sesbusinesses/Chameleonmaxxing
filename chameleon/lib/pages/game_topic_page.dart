@@ -49,7 +49,7 @@ class GameTopicPageState extends State<GameTopicPage> {
                         ),
                       ),
                       Expanded(child: DisplayGrid(userList: words)),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       FutureBuilder<bool>(
                         future: DatabaseManager.isPlayerTheChameleon(
                             widget.roomCode, widget.playerId),
@@ -75,7 +75,7 @@ class GameTopicPageState extends State<GameTopicPage> {
                                         'Loading...'; // Or some placeholder text
                                   }
                                   return Padding(
-                                    padding: const EdgeInsets.only(bottom: 10),
+                                    padding: const EdgeInsets.only(bottom: 8),
                                     child: RevealButton(
                                         text: 'Press To Reveal Word',
                                         revealText: revealText),
@@ -84,7 +84,7 @@ class GameTopicPageState extends State<GameTopicPage> {
                               );
                             }
                             return Padding(
-                              padding: const EdgeInsets.only(bottom: 10),
+                              padding: const EdgeInsets.only(bottom: 8),
                               child: RevealButton(
                                   text: 'Press To Reveal Word',
                                   revealText: revealText),
@@ -94,7 +94,6 @@ class GameTopicPageState extends State<GameTopicPage> {
                           }
                         },
                       ),
-                      const SizedBox(height: 10),
                     ],
                   );
                 } else {

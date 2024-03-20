@@ -92,7 +92,7 @@ class SelectableGridState extends State<SelectableGrid> {
         ),
         if (!_isSelectionConfirmed) // Only show the vote button if no selection has been confirmed
           Padding(
-            padding: const EdgeInsets.only(top: 20),
+            padding: const EdgeInsets.only(top: 10),
             child: WideButton(
               text: 'Vote',
               onPressed: () {

@@ -112,7 +112,8 @@ class _WaitingPageState extends State<WaitingPage> with WidgetsBindingObserver {
           title: Text('Join Code: ${widget.roomCode}'),
           automaticallyImplyLeading: false,
         ),
-        body: Stack(
+        body: SafeArea(
+            child: Stack(
           children: [
             PageView(
               controller: _pageController,
@@ -131,13 +132,13 @@ class _WaitingPageState extends State<WaitingPage> with WidgetsBindingObserver {
             ),
             if (showSwipePrompt)
               const Positioned(
-                bottom: 200,
+                bottom: 390,
                 left: 0,
                 right: 0,
                 child: FloatingText(),
               ),
           ],
-        ),
+        )),
       ),
     );
   }

@@ -134,7 +134,7 @@ class PlayAgainPageState extends State<PlayAgainPage> {
                 DatabaseManager.votePlayAgain(widget.roomCode, widget.playerId);
               },
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 10),
             WideButton(
               text: 'Leave Game',
               color: Colors.red,

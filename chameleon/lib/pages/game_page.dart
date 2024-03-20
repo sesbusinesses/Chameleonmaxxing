@@ -114,29 +114,24 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     return PopScope(
         canPop: false,
         child: Scaffold(
-            body: //SafeArea(
-                //child:
-                Padding(
-                    padding: EdgeInsets.only(top: 40),
-                    child: Stack(children: [
-                      PageView(
-                        scrollDirection: Axis.horizontal,
-                        children: pages,
-                        onPageChanged: (int page) {
-                          if (page == pages.length - 1) {
-                            _hideSwipePrompt();
-                          }
-                        },
-                      ),
-                      if (showSwipePrompt)
-                        const Positioned(
-                          bottom: 200,
-                          left: 0,
-                          right: 0,
-                          child: FloatingText(),
-                        ),
-                    ])
-                    //)
-                    )));
+            body: SafeArea(
+                child: Stack(children: [
+          PageView(
+            scrollDirection: Axis.horizontal,
+            children: pages,
+            onPageChanged: (int page) {
+              if (page == pages.length - 1) {
+                _hideSwipePrompt();
+              }
+            },
+          ),
+          if (showSwipePrompt)
+            const Positioned(
+              bottom: 390,
+              left: 0,
+              right: 0,
+              child: FloatingText(),
+            ),
+        ]))));
   }
 }
