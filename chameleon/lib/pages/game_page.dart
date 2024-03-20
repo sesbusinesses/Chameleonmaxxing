@@ -7,6 +7,7 @@ import 'end_game_page.dart';
 import 'game_topic_page.dart';
 import 'game_people_page.dart';
 import 'cham_guess_page.dart'; // Import the ChamGuessPage
+import '../widgets/utility.dart';
 
 class GamePage extends StatefulWidget {
   final String roomCode;
@@ -36,17 +37,28 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     voteNumSubscription = voteNumStream.listen((voteNum) async {
       // Make this callback async
       if (voteNum) {
-        await DatabaseManager.endGame(
+        bool voteTie = await DatabaseManager.isThereTie(widget.roomCode);
+        if(voteTie != true){
+          await DatabaseManager.endGame(
             widget.roomCode); // Wait for endGame to complete
-        if (mounted) {
-          // Check if the widget is still in the widget tree
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => EndGamePage(
-                    roomCode: widget.roomCode, playerId: widget.playerId)),
-          );
+          if (mounted) {
+            // Check if the widget is still in the widget tree
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => EndGamePage(
+                      roomCode: widget.roomCode, playerId: widget.playerId)),
+            );
+          }
         }
+        else{
+          DatabaseManager.resetVoteNum(widget.roomCode);
+          DatabaseManager.resetToRevote(widget.roomCode);
+          print("reseted");
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => GamePage(roomCode: widget.roomCode, playerId: widget.playerId)));
+          showMessage(context, 'It seems like humans are not sure who the alien is. Everyone give another clue.');
+        }
+        
       }
     });
 

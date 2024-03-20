@@ -147,14 +147,16 @@ class _CardListState extends State<CardList> {
                             return const Padding(
                               padding: EdgeInsets.only(
                                   top: 20.0), // Adjust the padding as needed
-                              // child: Center(
-                              //   child: IconButton(
-                              //     icon: const Icon(Icons.add_circle_outline,
-                              //         size: 50),
-                              //     onPressed: () =>
-                              //         _showAddTopicCardDialog(context),
-                              //   ),
-                              // ),
+                                  /*
+                               child: Center(
+                                 child: IconButton(
+                                   icon: const Icon(Icons.add_circle_outline,
+                                       size: 50),
+                                   onPressed: () =>
+                                       _showAddTopicCardDialog(context),
+                                 ),
+                               ),
+                               */
                             );
                           }
                           return null;
