@@ -122,7 +122,7 @@ class PlayAgainPageState extends State<PlayAgainPage> {
         ),
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.only(bottom: 8),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           mainAxisSize: MainAxisSize.min,
@@ -134,7 +134,7 @@ class PlayAgainPageState extends State<PlayAgainPage> {
                 DatabaseManager.votePlayAgain(widget.roomCode, widget.playerId);
               },
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 15),
             WideButton(
               text: 'Leave Game',
               color: Colors.red,

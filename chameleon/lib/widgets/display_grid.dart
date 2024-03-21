@@ -13,7 +13,7 @@ class DisplayGrid extends StatelessWidget {
     List<bool>? hasVoted,
     this.crossAxisCount = 2,
     this.trueColor = Colors.green,
-    this.falseColor = Colors.blue,
+    this.falseColor = const Color.fromARGB(255, 82, 82, 82),
   }) : hasVoted = hasVoted ?? List<bool>.filled(userList.length, true);
 
   @override
