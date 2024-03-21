@@ -24,7 +24,7 @@ class GamePeoplePage extends StatelessWidget {
                 return Padding(
                   padding: const EdgeInsets.all(10),
                   child: Text(
-                    '${voteSnapshot.data} People Have Voted the Alien',
+                    '${voteSnapshot.data} People Have Voted for the Alien',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
