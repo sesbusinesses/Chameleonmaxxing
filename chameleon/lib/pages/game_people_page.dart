@@ -15,44 +15,60 @@ class GamePeoplePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<List<String>>(
-        future: DatabaseManager.getPlayerUsernames(roomCode),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                const Padding(
+      body: Column(
+        children: [
+          StreamBuilder<int>(
+            stream: DatabaseManager.streamVoteNum(roomCode),
+            builder: (context, voteSnapshot) {
+              if (voteSnapshot.hasData) {
+                return Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: Text(
+                    '${voteSnapshot.data} People Have Voted for the Alien',
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                );
+              } else {
+                return const Padding(
                   padding: EdgeInsets.all(10),
                   child: Text(
-                    'Vote for the Chameleon',
+                    'Waiting for votes...',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-                Expanded(
-                  child: SelectableGrid(
-                    // add a code that moves to reveal_page.dart
+                );
+              }
+            },
+          ),
+          Expanded(
+            child: FutureBuilder<List<String>>(
+              future: DatabaseManager.getPlayerUsernames(roomCode),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                  return SelectableGrid(
                     displayList: snapshot.data!,
                     color: Colors.grey,
                     updateField: 'votingCham',
                     roomCode: roomCode,
                     playerId: playerId,
-                  ),
-                ),
-                const SizedBox(height: 8),
-              ],
-            );
-          } else {
-            return const Center(child: Text('No players found'));
-          }
-        },
+                  );
+                } else {
+                  return const Center(child: Text('No players found'));
+                }
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
       ),
     );
   }
