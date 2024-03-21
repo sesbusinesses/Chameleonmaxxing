@@ -15,10 +15,13 @@ class GamePeoplePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+<<<<<<< HEAD
+=======
       appBar: AppBar(
         title: const Text('Vote for the Chameleon'),
         automaticallyImplyLeading: false,
       ),
+>>>>>>> 63adb8ee226f5b023a8f0d5139bde530f6f230e5
       body: Column(
         children: [
           StreamBuilder<int>(
@@ -28,7 +31,11 @@ class GamePeoplePage extends StatelessWidget {
                 return Padding(
                   padding: const EdgeInsets.all(10),
                   child: Text(
+<<<<<<< HEAD
+                    '${voteSnapshot.data} People Have Voted for the Alien',
+=======
                     '${voteSnapshot.data} People Have Voted',
+>>>>>>> 63adb8ee226f5b023a8f0d5139bde530f6f230e5
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
