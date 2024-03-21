@@ -112,6 +112,7 @@ class _CardListState extends State<CardList> {
                       title: Text('Topics'),
                       pinned: true,
                       backgroundColor: Colors.transparent,
+                      surfaceTintColor: Colors.transparent,
                     ),
                     SliverList(
                       delegate: SliverChildBuilderDelegate(
