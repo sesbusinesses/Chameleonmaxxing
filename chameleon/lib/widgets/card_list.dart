@@ -36,6 +36,7 @@ class _CardListState extends State<CardList> {
     super.dispose();
   }
 
+  // ignore: unused_element
   void _showAddTopicCardDialog(BuildContext context) {
     // Controllers for text fields
     TextEditingController topicController = TextEditingController();
@@ -203,8 +204,8 @@ class _CardListState extends State<CardList> {
                             );
                           } else if (index == topicCards.length) {
                             // Button for adding a new topic card, with space before it
-                            return Padding(
-                              padding: const EdgeInsets.only(
+                            return const Padding(
+                              padding: EdgeInsets.only(
                                   top: 20.0), // Adjust the padding as needed
                               // child: Center(
                               //   child: IconButton(
