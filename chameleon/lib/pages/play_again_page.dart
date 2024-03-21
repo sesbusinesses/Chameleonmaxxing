@@ -47,7 +47,6 @@ class PlayAgainPageState extends State<PlayAgainPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // Combined FutureBuilder from here
             FutureBuilder<List<dynamic>>(
               future: Future.wait([wasChameleonCaught, chameleonUsername]),
               builder: (context, snapshot) {
@@ -56,7 +55,6 @@ class PlayAgainPageState extends State<PlayAgainPage> {
                   final username = snapshot.data?[1];
                   return Column(
                     children: [
-                      //make this text always centered.
                       Text(
                         wasCaught ? 'Alien $username was caught!' : 'Alien $username escaped!',
                         textAlign: TextAlign.center,
@@ -70,14 +68,24 @@ class PlayAgainPageState extends State<PlayAgainPage> {
                 }
               },
             ),
-            // to here
             const SizedBox(height: 20),
             FutureBuilder<String?>(
               future: DatabaseManager.getTopicWord(widget.roomCode),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   if (snapshot.hasData && snapshot.data != null) {
-                    return Text('Secret Word: ${snapshot.data}');
+                    return RichText(
+                      text: TextSpan(
+                        text: 'Secret Word: ',
+                        style: DefaultTextStyle.of(context).style,
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: '${snapshot.data}',
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    );
                   } else {
                     return const Text('No topic word found');
                   }
