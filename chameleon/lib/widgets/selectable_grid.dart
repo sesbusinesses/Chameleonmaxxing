@@ -100,7 +100,7 @@ class SelectableGridState extends State<SelectableGrid>
                   alignment: Alignment.center,
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: isSelected ? Colors.red : widget.color,
+                    color: isSelected ? Colors.green : widget.color,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
