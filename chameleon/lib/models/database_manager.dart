@@ -158,6 +158,23 @@ class DatabaseManager {
     );
   }
 
+  static Stream<int> streamVoteNum(String roomCode) {
+    return _db.collection('room_code').doc(roomCode).snapshots().map(
+      (snapshot) {
+        if (snapshot.exists) {
+          List<dynamic> players = snapshot['players'];
+          int voteCount = players
+              .where((player) =>
+                  player['votingCham'] != null &&
+                  player['votingCham'].toString().isNotEmpty)
+              .length;
+          return voteCount;
+        }
+        return 0;
+      },
+    );
+  }
+
   static Stream<List<bool>> streamVotingStatus(String roomCode) {
     return _db.collection('room_code').doc(roomCode).snapshots().map(
       (snapshot) {
