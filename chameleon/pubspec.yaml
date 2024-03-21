@@ -57,7 +57,13 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/images/alienIcon.png"
+  image_path: "assets/images/spaceship2.png"
+  #use following in terminal to update the icon.
+  #flutter pub get
+  #flutter pub run flutter_launcher_icons:main
+  #flutter clean
+  #flutter pub get
+  #flutter run
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
