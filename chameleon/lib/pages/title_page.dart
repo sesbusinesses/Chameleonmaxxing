@@ -34,7 +34,7 @@ class TitlePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             const Text(
-              'The Spooky Alien',
+              'Aliens From SES',
               style: TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.bold,
