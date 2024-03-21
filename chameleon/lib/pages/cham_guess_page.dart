@@ -51,7 +51,6 @@ class ChamGuessPageState extends State<ChamGuessPage> {
                       Expanded(
                         child: SelectableGrid(
                             displayList: words,
-                            color: Colors.grey,
                             updateField:
                                 'chamGuess', // Assuming you handle the guess in your database logic
                             roomCode: widget.roomCode,

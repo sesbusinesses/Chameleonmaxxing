@@ -36,7 +36,6 @@ class WaitingTopicsPage extends StatelessWidget {
                       // Data is available, use it in SelectableGrid
                       return SelectableGrid(
                         displayList: snapshot.data!, // Use the fetched topics
-                        color: Colors.grey,
                         updateField: 'votingTopic',
                         roomCode: roomCode,
                         playerId: playerId,

@@ -56,7 +56,6 @@ class GamePeoplePage extends StatelessWidget {
                 } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return SelectableGrid(
                     displayList: snapshot.data!,
-                    color: Colors.grey,
                     updateField: 'votingCham',
                     roomCode: roomCode,
                     playerId: playerId,

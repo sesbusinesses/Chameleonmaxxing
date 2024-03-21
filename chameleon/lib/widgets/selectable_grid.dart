@@ -14,7 +14,7 @@ class SelectableGrid extends StatefulWidget {
     super.key,
     required this.displayList,
     this.crossAxisCount = 2,
-    this.color = Colors.blue,
+    this.color = const Color.fromARGB(255, 82, 82, 82),
     required this.updateField,
     required this.roomCode,
     required this.playerId,
@@ -64,7 +64,7 @@ class SelectableGridState extends State<SelectableGrid>
       //   widget.updateField,
       //   widget.displayList[index],
       // ).then((_) => _animationController.forward());
-       _animationController.forward();
+      _animationController.forward();
       setState(() {
         _selectedItemIndex = index;
       });
