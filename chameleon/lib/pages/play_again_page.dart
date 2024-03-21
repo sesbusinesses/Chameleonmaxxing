@@ -47,40 +47,40 @@ class PlayAgainPageState extends State<PlayAgainPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            FutureBuilder<bool>(
-              future: wasChameleonCaught,
+            // Combined FutureBuilder from here
+            FutureBuilder<List<dynamic>>(
+              future: Future.wait([wasChameleonCaught, chameleonUsername]),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
-                  return Text(
-                    snapshot.data == true
-                        ? 'Alien was caught!'
-                        : 'Alien escaped!',
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
+                  final wasCaught = snapshot.data?[0] ?? false;
+                  final username = snapshot.data?[1];
+                  return Column(
+                    children: [
+                      //make this text always centered.
+                      Text(
+                        wasCaught ? 'Alien $username was caught!' : 'Alien $username escaped!',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                    ],
                   );
                 } else {
                   return const CircularProgressIndicator();
                 }
               },
             ),
+            // to here
             const SizedBox(height: 20),
             FutureBuilder<String?>(
-              future: chameleonUsername,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done &&
-                    snapshot.hasData) {
-                  return Text('Alien was: ${snapshot.data}');
-                } else {
-                  return const Text('Loading alien identity...');
-                }
-              },
-            ),
-            const SizedBox(height: 20),
-            FutureBuilder<int>(
-              future: playerScore,
+              future: DatabaseManager.getTopicWord(widget.roomCode),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
-                  return Text('Your score: ${snapshot.data}');
+                  if (snapshot.hasData && snapshot.data != null) {
+                    return Text('Secret Word: ${snapshot.data}');
+                  } else {
+                    return const Text('No topic word found');
+                  }
                 } else {
                   return const CircularProgressIndicator();
                 }
@@ -96,24 +96,21 @@ class PlayAgainPageState extends State<PlayAgainPage> {
                 if (!playerSnapshot.hasData) {
                   return const Text('No player data available');
                 }
-                // Ensure there's a corresponding StreamBuilder for playAgainStream
                 return StreamBuilder<List<bool>>(
                   stream: playAgainStream,
                   builder: (context, playAgainSnapshot) {
-                    if (playAgainSnapshot.connectionState ==
-                        ConnectionState.waiting) {
+                    if (playAgainSnapshot.connectionState == ConnectionState.waiting) {
                       return const CircularProgressIndicator();
                     }
                     if (!playAgainSnapshot.hasData) {
                       return const Text('Waiting for players\' decisions...');
                     }
-                    // Assuming DisplayGrid can handle empty or null lists properly
                     return Expanded(
-                        child: DisplayGrid(
-                      userList: playerSnapshot.data!,
-                      hasVoted: playAgainSnapshot
-                          .data!, // Assuming hasVoted is analogous to wantsToPlayAgain
-                    ));
+                      child: DisplayGrid(
+                        userList: playerSnapshot.data!,
+                        hasVoted: playAgainSnapshot.data!,
+                      ),
+                    );
                   },
                 );
               },
@@ -143,15 +140,11 @@ class PlayAgainPageState extends State<PlayAgainPage> {
                 if (host) {
                   await DatabaseManager.removeEntireRoom(widget.roomCode);
                 } else {
-                  await DatabaseManager.removePlayerFromRoom(
-                      widget.roomCode, widget.playerId);
+                  await DatabaseManager.removePlayerFromRoom(widget.roomCode, widget.playerId);
                 }
-                // Navigate back to the title/home page
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          const TitlePage()), // Assuming TitlePage is your app's entry page
+                  MaterialPageRoute(builder: (context) => const TitlePage()),
                   (Route<dynamic> route) => false,
                 );
               },
