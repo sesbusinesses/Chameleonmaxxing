@@ -58,12 +58,13 @@ class SelectableGridState extends State<SelectableGrid>
 
   void _updateSelection(int index) {
     if (!_isSelectionConfirmed) {
-      DatabaseManager.updatePlayerSelection(
-        widget.roomCode,
-        widget.playerId,
-        widget.updateField,
-        widget.displayList[index],
-      ).then((_) => _animationController.forward());
+      // DatabaseManager.updatePlayerSelection(
+      //   widget.roomCode,
+      //   widget.playerId,
+      //   widget.updateField,
+      //   widget.displayList[index],
+      // ).then((_) => _animationController.forward());
+       _animationController.forward();
       setState(() {
         _selectedItemIndex = index;
       });
