@@ -39,6 +39,7 @@ class _WaitingPageState extends State<WaitingPage> with WidgetsBindingObserver {
     gameRunningStream = DatabaseManager.streamGameRunning(widget.roomCode);
     doesRoomExistStream = DatabaseManager.streamDoesRoomExist(widget.roomCode);
     WidgetsBinding.instance.addObserver(this);
+    checkFirstGame();
 
     gameRunningSubscription = gameRunningStream.listen((isGameRunning) {
       if (isGameRunning) {
@@ -61,6 +62,14 @@ class _WaitingPageState extends State<WaitingPage> with WidgetsBindingObserver {
           showMessage(context, 'The room no longer exists.');
         }
       }
+    });
+  }
+
+  void checkFirstGame() async {
+    // Use DatabaseManager.isFirstGame and update showSwipePrompt state
+    bool isFirstGame = await DatabaseManager.isFirstGame(widget.roomCode);
+    setState(() {
+      showSwipePrompt = isFirstGame;
     });
   }
 

@@ -30,6 +30,7 @@ class DatabaseManager {
       'topicWord': FieldValue.delete(), // Remove the topicWord field
       'Topic': FieldValue.delete(), // Remove the Topic field
       'gameRunning': false, // Set gameRunning to false
+      'firstGame': false, // Set firstGame to false
       // Add more fields to reset if necessary
     });
 
@@ -73,6 +74,7 @@ class DatabaseManager {
     await _db.collection('room_code').doc(roomCode).set({
       'code': roomCode,
       'gameRunning': false,
+      'firstGame': true,
       'players': [
         {
           'isCham': false,
@@ -934,5 +936,21 @@ class DatabaseManager {
       }
     } catch (e) {}
     return false; // Username does not exist in the room or an error occurred
+  }
+
+  static Future<bool> isFirstGame(String roomCode) async {
+    try {
+      DocumentSnapshot roomDoc =
+          await _db.collection('room_code').doc(roomCode).get();
+      if (roomDoc.exists && roomDoc.data() != null) {
+        Map<String, dynamic> roomData = roomDoc.data() as Map<String, dynamic>;
+        // Check if 'firstGame' field exists and return its value, otherwise return false
+        return roomData['firstGame'] ?? false;
+      }
+    } catch (e) {
+      print("Error checking if first game: $e");
+    }
+    // If the document does not exist, or 'firstGame' field is not present, return false
+    return false;
   }
 }

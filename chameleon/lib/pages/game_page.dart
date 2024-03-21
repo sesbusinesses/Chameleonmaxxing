@@ -37,6 +37,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     voteNumStream = DatabaseManager.getVoteNumStream(widget.roomCode);
     doesRoomExistStream = DatabaseManager.streamDoesRoomExist(widget.roomCode);
     WidgetsBinding.instance.addObserver(this);
+    checkFirstGame();
 
     // Listen for changes in the voteNum to determine when to navigate to the EndGamePage.
     voteNumSubscription = voteNumStream.listen((voteNum) async {
@@ -77,6 +78,14 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
         Navigator.popUntil(context, (route) => route.isFirst);
         showMessage(context, 'The room no longer exists');
       }
+    });
+  }
+
+  void checkFirstGame() async {
+    // Use DatabaseManager.isFirstGame and update showSwipePrompt state
+    bool isFirstGame = await DatabaseManager.isFirstGame(widget.roomCode);
+    setState(() {
+      showSwipePrompt = isFirstGame;
     });
   }
 
