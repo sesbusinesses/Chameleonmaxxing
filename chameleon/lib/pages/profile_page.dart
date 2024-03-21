@@ -83,7 +83,7 @@ class _ProfilePageState extends State<ProfilePage> {
               text: 'Save and Exit',
               color: Colors.red,
               onPressed: () {
-                if (_usernameController.text.length <= 20) {
+                if (_usernameController.text.length <= 10) {
                   _saveUsernameAndExit();
                 } else {
                   showMessage(
