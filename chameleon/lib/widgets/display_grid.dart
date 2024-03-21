@@ -34,7 +34,7 @@ class DisplayGrid extends StatelessWidget {
                 Color itemColor = hasVoted[index] ? trueColor : falseColor;
                 return Container(
                   alignment: Alignment.center,
-                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
                   decoration: BoxDecoration(
                     color: itemColor,
                     borderRadius: BorderRadius.circular(10),
