@@ -83,11 +83,12 @@ class _ProfilePageState extends State<ProfilePage> {
               text: 'Save and Exit',
               color: Colors.red,
               onPressed: () {
-                if (_usernameController.text.length <= 10) {
+                int minCharUsername = 10;
+                if (_usernameController.text.length <= minCharUsername) {
                   _saveUsernameAndExit();
                 } else {
                   showMessage(
-                      context, 'Username must be 20 characters or less');
+                      context, 'Username must be ${minCharUsername}  characters or less');
                 }
               },
             ),
