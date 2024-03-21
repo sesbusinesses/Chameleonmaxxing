@@ -34,13 +34,17 @@ class DisplayGrid extends StatelessWidget {
                 Color itemColor = hasVoted[index] ? trueColor : falseColor;
                 return Container(
                   alignment: Alignment.center,
+                  padding: EdgeInsets.symmetric(horizontal: 8),
                   decoration: BoxDecoration(
                     color: itemColor,
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Text(
-                    userList[index],
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                  child: Center(
+                    child: Text(
+                      userList[index],
+                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 );
               },

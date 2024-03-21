@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/database_manager.dart';
-import '../widgets/wide_button.dart'; // Adjust the import path as necessary
-// Ensure this import is correct
+import '../widgets/wide_button.dart';
 
 class SelectableGrid extends StatefulWidget {
   final List<String> displayList;
@@ -12,40 +11,69 @@ class SelectableGrid extends StatefulWidget {
   final String playerId;
 
   const SelectableGrid({
-    super.key,
+    Key? key,
     required this.displayList,
     this.crossAxisCount = 2,
     this.color = Colors.blue,
     required this.updateField,
     required this.roomCode,
     required this.playerId,
-  });
+  }) : super(key: key);
 
   @override
   SelectableGridState createState() => SelectableGridState();
 }
 
-class SelectableGridState extends State<SelectableGrid> {
+class SelectableGridState extends State<SelectableGrid>
+    with SingleTickerProviderStateMixin {
   int? _selectedItemIndex;
   bool _isSelectionConfirmed = false;
+  late AnimationController _animationController;
 
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+
     _fetchInitialSelection();
   }
 
-  void _fetchInitialSelection() async {
+  Future<void> _fetchInitialSelection() async {
     String? initialSelection = await DatabaseManager.fetchInitialSelection(
-        widget.roomCode, widget.playerId, widget.updateField);
+      widget.roomCode,
+      widget.playerId,
+      widget.updateField,
+    );
     if (initialSelection != null &&
         widget.displayList.contains(initialSelection)) {
       setState(() {
         _selectedItemIndex = widget.displayList.indexOf(initialSelection);
-        _isSelectionConfirmed =
-            true; // Confirm selection if there's an initial one
+        _isSelectionConfirmed = true;
       });
     }
+  }
+
+  void _updateSelection(int index) {
+    if (!_isSelectionConfirmed) {
+      DatabaseManager.updatePlayerSelection(
+        widget.roomCode,
+        widget.playerId,
+        widget.updateField,
+        widget.displayList[index],
+      ).then((_) => _animationController.forward());
+      setState(() {
+        _selectedItemIndex = index;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
   }
 
   @override
@@ -65,24 +93,18 @@ class SelectableGridState extends State<SelectableGrid> {
             itemBuilder: (context, index) {
               final bool isSelected = _selectedItemIndex == index;
               return GestureDetector(
-                onTap: _isSelectionConfirmed
-                    ? null
-                    : () {
-                        setState(() {
-                          _selectedItemIndex = index;
-                        });
-                      },
-                child: Container(
+                onTap: () => _updateSelection(index),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
                   alignment: Alignment.center,
+                  padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: isSelected ? Colors.red : widget.color,
                     borderRadius: BorderRadius.circular(10),
-                    border: isSelected
-                        ? Border.all(color: Colors.white, width: 2)
-                        : null,
                   ),
                   child: Text(
                     widget.displayList[index],
+                    textAlign: TextAlign.center,
                     style: const TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
@@ -90,7 +112,7 @@ class SelectableGridState extends State<SelectableGrid> {
             },
           ),
         ),
-        if (!_isSelectionConfirmed) // Only show the vote button if no selection has been confirmed
+        if (!_isSelectionConfirmed)
           Padding(
             padding: const EdgeInsets.only(top: 10),
             child: WideButton(

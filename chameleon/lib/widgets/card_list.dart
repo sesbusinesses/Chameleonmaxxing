@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:chameleon/pages/card_display.dart';
 import 'package:chameleon/models/topic_card.dart';
