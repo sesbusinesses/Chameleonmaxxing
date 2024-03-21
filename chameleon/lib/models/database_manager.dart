@@ -947,9 +947,7 @@ class DatabaseManager {
         // Check if 'firstGame' field exists and return its value, otherwise return false
         return roomData['firstGame'] ?? false;
       }
-    } catch (e) {
-      print("Error checking if first game: $e");
-    }
+    } catch (e) {}
     // If the document does not exist, or 'firstGame' field is not present, return false
     return false;
   }
