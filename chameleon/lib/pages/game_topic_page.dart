@@ -60,7 +60,7 @@ class GameTopicPageState extends State<GameTopicPage> {
                     },
                   ),
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 FutureBuilder<bool>(
                   future: DatabaseManager.isPlayerTheChameleon(
                       widget.roomCode, widget.playerId),

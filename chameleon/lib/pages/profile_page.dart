@@ -87,8 +87,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 if (_usernameController.text.length <= minCharUsername) {
                   _saveUsernameAndExit();
                 } else {
-                  showMessage(
-                      context, 'Username must be ${minCharUsername}  characters or less');
+                  showMessage(context,
+                      'Username must be $minCharUsername  characters or less');
                 }
               },
             ),
