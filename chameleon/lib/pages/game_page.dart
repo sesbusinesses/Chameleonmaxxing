@@ -124,7 +124,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.detached) {
       // Start a timer to remove the player if they don't return in time
-      _kickoutTimer = Timer(const Duration(minutes: 1), () {
+      _kickoutTimer = Timer(const Duration(minutes: 100), () {
         DatabaseManager.removePlayerFromRoom(widget.roomCode, widget.playerId);
         Navigator.popUntil(context, (route) => route.isFirst);
       });
